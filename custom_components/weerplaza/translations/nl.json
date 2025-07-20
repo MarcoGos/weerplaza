@@ -7,15 +7,14 @@
     "entity": {
         "camera": {
             "animated_radar": {
-                "name": "Radar Camera"
+                "name": "Neerslag Camera"
+            },
+            "animated_satellite": {
+                "name": "Satelliet Camera"
+            },
+            "animated_thunder": {
+                "name": "Onweer Camera"
             }
-        },
-        "image": {
-            "radar": {
-                "name": "Radar Image"
-            }
-        },
-        "sensor": {
         }
     }
 }

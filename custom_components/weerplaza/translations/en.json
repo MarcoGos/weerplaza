@@ -8,11 +8,12 @@
         "camera": {
             "animated_radar": {
                 "name": "Radar Camera"
-            }
-        },
-        "image": {
-            "radar": {
-                "name": "Radar Image"
+            },
+            "animated_satellite": {
+                "name": "Satellite Camera"
+            },
+            "animated_thunder": {
+                "name": "Thunder Camera"
             }
         },
         "sensor": {

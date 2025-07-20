@@ -13,7 +13,7 @@ from .api import WeerPlazaApi
 from .const import DOMAIN, NAME, MANUFACTURER
 from .coordinator import WeerPlazaDataUpdateCoordinator
 
-PLATFORMS: list[Platform] = [Platform.IMAGE, Platform.CAMERA]
+PLATFORMS: list[Platform] = [Platform.CAMERA]
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 

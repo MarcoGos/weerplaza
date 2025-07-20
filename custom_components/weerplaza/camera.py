@@ -1,9 +1,6 @@
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.components.camera import (
-    Camera,
-    CameraEntityDescription
-)
+from homeassistant.components.camera import Camera, CameraEntityDescription
 from homeassistant.components.camera.const import DOMAIN as CAMERA_DOMAIN
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -12,7 +9,21 @@ from .const import DEFAULT_NAME, DOMAIN
 from .coordinator import WeerPlazaDataUpdateCoordinator
 
 DESCRIPTIONS: list[CameraEntityDescription] = [
-    CameraEntityDescription(key="animated_radar", translation_key="animated_radar", icon="mdi:radar")
+    CameraEntityDescription(
+        key="animated_radar",
+        translation_key="animated_radar",
+        icon="mdi:radar",
+    ),
+    CameraEntityDescription(
+        key="animated_satellite",
+        translation_key="animated_satellite",
+        icon="mdi:satellite",
+    ),
+    CameraEntityDescription(
+        key="animated_thunder",
+        translation_key="animated_thunder",
+        icon="mdi:thunderstorm",
+    ),
 ]
 
 
@@ -62,10 +73,13 @@ class WeerPlazaCamera(CoordinatorEntity[WeerPlazaDataUpdateCoordinator], Camera)
         self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {description.key}"
         self._hass = hass
         self._attr_device_info = coordinator.device_info
-    
+
     async def async_camera_image(
         self, width: int | None = None, height: int | None = None
     ) -> bytes | None:
         """Return bytes of camera image or None."""
-        image = await self._hass.async_add_executor_job(self.coordinator.api.get_animated_radar)
+        image = await self._hass.async_add_executor_job(
+            self.coordinator.api.get_animated_image,
+            self.entity_description.key.removeprefix("animated_"),
+        )
         return image
