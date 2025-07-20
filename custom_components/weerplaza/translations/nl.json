@@ -5,6 +5,11 @@
         }
     },
     "entity": {
+        "camera": {
+            "animated_radar": {
+                "name": "Radar Camera"
+            }
+        },
         "image": {
             "radar": {
                 "name": "Radar Image"

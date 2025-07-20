@@ -2,7 +2,7 @@
 
 NAME = "Weer Plaza"
 DOMAIN = "weerplaza"
-MANUFACTURER = ""
+MANUFACTURER = "weerplaza"
 MODEL = "Weer Plaza"
 
 # Platforms

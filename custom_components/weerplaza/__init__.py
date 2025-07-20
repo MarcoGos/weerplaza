@@ -6,15 +6,14 @@ import logging
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.const import Platform
 
 from .api import WeerPlazaApi
 from .const import DOMAIN, NAME, MANUFACTURER
 from .coordinator import WeerPlazaDataUpdateCoordinator
 
-PLATFORMS: list[Platform] = [Platform.IMAGE]
+PLATFORMS: list[Platform] = [Platform.IMAGE, Platform.CAMERA]
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 
@@ -30,11 +29,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     _LOGGER.debug(f"entry.data: {entry.data}")
 
-    session = async_get_clientsession(hass)
-    client = WeerPlazaApi(session)
+    client = WeerPlazaApi(hass)
 
     device_info = DeviceInfo(
-        entry_type=DeviceEntryType.SERVICE,
         identifiers={(DOMAIN, entry.entry_id)},
         manufacturer=MANUFACTURER,
         name=NAME,

@@ -1,18 +1,18 @@
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.components.image import (
-    ImageEntity,
-    ImageEntityDescription,
+from homeassistant.components.camera import (
+    Camera,
+    CameraEntityDescription
 )
-from homeassistant.components.image.const import DOMAIN as IMAGE_DOMAIN
+from homeassistant.components.camera.const import DOMAIN as CAMERA_DOMAIN
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DEFAULT_NAME, DOMAIN
 from .coordinator import WeerPlazaDataUpdateCoordinator
 
-DESCRIPTIONS: list[ImageEntityDescription] = [
-    ImageEntityDescription(key="radar", translation_key="radar", icon="mdi:radar")
+DESCRIPTIONS: list[CameraEntityDescription] = [
+    CameraEntityDescription(key="animated_radar", translation_key="animated_radar", icon="mdi:radar")
 ]
 
 
@@ -21,15 +21,15 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up Weer Plaza images based on a config entry."""
+    """Set up Weer Plaza cameras based on a config entry."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
 
-    entities: list[WeerPlazaImage] = []
+    entities: list[WeerPlazaCamera] = []
 
     # Add all images described above.
     for description in DESCRIPTIONS:
         entities.append(
-            WeerPlazaImage(
+            WeerPlazaCamera(
                 coordinator=coordinator,
                 entry_id=entry.entry_id,
                 description=description,
@@ -40,8 +40,8 @@ async def async_setup_entry(
     async_add_entities(entities)
 
 
-class WeerPlazaImage(CoordinatorEntity[WeerPlazaDataUpdateCoordinator], ImageEntity):
-    """Defines the radar weer plaza image."""
+class WeerPlazaCamera(CoordinatorEntity[WeerPlazaDataUpdateCoordinator], Camera):
+    """Defines the radar weer plaza camera."""
 
     _attr_has_entity_name = True
     _attr_content_type = "image/gif"
@@ -50,22 +50,22 @@ class WeerPlazaImage(CoordinatorEntity[WeerPlazaDataUpdateCoordinator], ImageEnt
         self,
         coordinator: WeerPlazaDataUpdateCoordinator,
         entry_id: str,
-        description: ImageEntityDescription,
+        description: CameraEntityDescription,
         hass: HomeAssistant,
     ) -> None:
-        """Initialize Weer Plaza image."""
-        ImageEntity.__init__(self, hass)
+        """Initialize Weer Plaza camera."""
+        Camera.__init__(self)
         super().__init__(coordinator=coordinator)
 
         self.entity_description = description
-        self.entity_id = f"{IMAGE_DOMAIN}.{DEFAULT_NAME}_{description.key}".lower()
+        self.entity_id = f"{CAMERA_DOMAIN}.{DEFAULT_NAME}_{description.key}".lower()
         self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {description.key}"
         self._hass = hass
         self._attr_device_info = coordinator.device_info
-
-    async def async_image(self) -> bytes | None:
-        """Return bytes of image or None."""
-        if image := await self._hass.async_add_executor_job(self.coordinator.api.get_latest_image):
-            return image
-
-        return None
+    
+    async def async_camera_image(
+        self, width: int | None = None, height: int | None = None
+    ) -> bytes | None:
+        """Return bytes of camera image or None."""
+        image = await self._hass.async_add_executor_job(self.coordinator.api.get_animated_radar)
+        return image
