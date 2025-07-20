@@ -182,8 +182,8 @@ class WeerPlazaApi:
         return img_byte_arr.getvalue()
 
     def __delete_old_files(self, image_type: str):
-        """Delete images older than 12 hours."""
-        bandwidth = 12 * 60 * 60  # 12 hours in seconds
+        """Delete images older than 100 minuten."""
+        bandwidth = 100 * 60  # 100 minuten in seconds
         file_path = self.get_storage_path(image_type)
         files = glob.glob(os.path.join(file_path, "*.png"))
         for file in files:

@@ -37,10 +37,10 @@ class WeerPlazaDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self) -> None:
         """Update data via library."""
-        # try:
-        await self.api.async_get_new_images()
-        # except Exception as exception:
-        #     _LOGGER.error(
-        #         "Error WeerPlazaDataUpdateCoordinator _async_update_data: %s", exception
-        #     )
-        #     raise UpdateFailed() from exception
+        try:
+            await self.api.async_get_new_images()
+        except Exception as exception:
+            _LOGGER.error(
+                "Error WeerPlazaDataUpdateCoordinator _async_update_data: %s", exception
+            )
+            raise UpdateFailed() from exception
