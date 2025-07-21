@@ -2,6 +2,11 @@
     "config": {
         "abort": {
             "already_configured": "Device is already configured"
+        },
+        "step": {
+            "user": {
+                "description": "This will install the WeerPlaza integration."
+            }
         }
     },
     "entity": {

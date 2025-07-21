@@ -2,6 +2,11 @@
     "config": {
         "abort": {
             "already_configured": "Apparaat is al geconfigureerd"
+        },
+        "step": {
+            "user": {
+                "description": "Hiermee wordt de WeerPlaza integratie geïnstalleerd."
+            }
         }
     },
     "entity": {
