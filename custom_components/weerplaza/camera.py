@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.components.camera import Camera, CameraEntityDescription
@@ -8,24 +9,34 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DEFAULT_NAME, DOMAIN
 from .coordinator import WeerPlazaDataUpdateCoordinator
 
-DESCRIPTIONS: list[CameraEntityDescription] = [
-    CameraEntityDescription(
+@dataclass(frozen=True)
+class WeerPlazaCameraEntityDescription(CameraEntityDescription):
+    """Describes Weer Plaza camera entity."""
+    key: str | None = None
+    translation_key: str | None = None
+    icon: str | None = None
+    image_type: str | None = None  # Default type, can be overridden
+
+DESCRIPTIONS: list[WeerPlazaCameraEntityDescription] = [
+    WeerPlazaCameraEntityDescription(
         key="animated_radar",
         translation_key="animated_radar",
         icon="mdi:radar",
+        image_type="radar",
     ),
-    CameraEntityDescription(
+    WeerPlazaCameraEntityDescription(
         key="animated_satellite",
         translation_key="animated_satellite",
         icon="mdi:satellite",
+        image_type="satellite",
     ),
-    CameraEntityDescription(
+    WeerPlazaCameraEntityDescription(
         key="animated_thunder",
         translation_key="animated_thunder",
         icon="mdi:thunderstorm",
+        image_type="thunder",
     ),
 ]
-
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -56,12 +67,13 @@ class WeerPlazaCamera(CoordinatorEntity[WeerPlazaDataUpdateCoordinator], Camera)
 
     _attr_has_entity_name = True
     _attr_content_type = "image/gif"
+    entity_description: WeerPlazaCameraEntityDescription
 
     def __init__(
         self,
         coordinator: WeerPlazaDataUpdateCoordinator,
         entry_id: str,
-        description: CameraEntityDescription,
+        description: WeerPlazaCameraEntityDescription,
         hass: HomeAssistant,
     ) -> None:
         """Initialize Weer Plaza camera."""
@@ -78,8 +90,6 @@ class WeerPlazaCamera(CoordinatorEntity[WeerPlazaDataUpdateCoordinator], Camera)
         self, width: int | None = None, height: int | None = None
     ) -> bytes | None:
         """Return bytes of camera image or None."""
-        image = await self._hass.async_add_executor_job(
-            self.coordinator.api.get_animated_image,
-            self.entity_description.key.removeprefix("animated_"),
-        )
+        image_type = self.entity_description.image_type or "radar"
+        image = await self.coordinator.api.async_get_animated_image(image_type)
         return image
