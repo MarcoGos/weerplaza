@@ -15,6 +15,16 @@
             "animated_thunder": {
                 "name": "Thunder Camera"
             }
+        },
+        "number": {
+            "latitude": {
+                "name": "Latitude",
+                "description": "Set the latitude for the marker location."
+            },
+            "longitude": {
+                "name": "Longitude",
+                "description": "Set the longitude for the marker location."
+            }
         }
     },
     "services": {
@@ -31,6 +41,10 @@
                     "description": "Longitude of the marker location."
                 }
             }
+        },
+        "force_update": {
+            "name": "Force Update",
+            "description": "Force an update of the Weerplaza images."
         }
     }
 }

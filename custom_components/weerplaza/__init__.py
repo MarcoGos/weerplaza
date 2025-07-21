@@ -14,7 +14,7 @@ from .const import DOMAIN, NAME, MANUFACTURER
 from .coordinator import WeerPlazaDataUpdateCoordinator
 from .services import WeerPlazaServicesSetup
 
-PLATFORMS: list[Platform] = [Platform.CAMERA]
+PLATFORMS: list[Platform] = [Platform.CAMERA]  # , Platform.NUMBER]
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 

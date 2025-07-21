@@ -17,6 +17,7 @@ from PIL import Image, ImageFile, ImageDraw, ImageFont
 import imageio.v2 as imageio
 
 from .const import DOMAIN
+from .tools import calculate_mercator_position
 
 TIMEOUT = 10
 IMAGES_TO_KEEP = 18
@@ -121,12 +122,10 @@ class WeerPlazaApi:
             f"custom_components/{DOMAIN}/images/Radar-1050-borders-v2.png"
         ) as image:
             return image.convert("RGBA")
-        
+
     def __get_marker_image(self) -> Image.Image:
-        with Image.open(
-            f"custom_components/{DOMAIN}/images/pointer-50.png"
-        ) as image:
-            return image.convert("RGBA") #.resize((50, 50), Image.Resampling.LANCZOS)
+        with Image.open(f"custom_components/{DOMAIN}/images/pointer-50.png") as image:
+            return image.convert("RGBA")  # .resize((50, 50), Image.Resampling.LANCZOS)
 
     def __create_image(
         self, original: ImageFile.ImageFile, image_type: str, time_val: datetime
@@ -214,17 +213,28 @@ class WeerPlazaApi:
             if self._latitude and self._longitude:
                 final = Image.open(image_data).convert("RGBA")
                 marker = self.__get_marker_image()
-                # marker_x = int((self._longitude + 180) * (final.width / 360))
-                # marker_y = int((90 - self._latitude) * (final.height / 180))
-                marker_x = int(final.width / 2)
-                marker_y = int(final.height / 2)
-                final.paste(marker, (marker_x - int(marker.width / 2), marker_y - int(marker.height / 2)), marker)
+                marker_x, marker_y = calculate_mercator_position(
+                    self._latitude,
+                    self._longitude,
+                    llon=1.556,
+                    rlon=8.8,  # 8.972,
+                    tlat=54.239,  # 54.239,
+                    width=final.width,
+                )
+                final.paste(
+                    marker,
+                    (
+                        marker_x - int(marker.width / 2),
+                        marker_y - int(marker.height / 2),
+                    ),
+                    marker,
+                )
                 image_stream = BytesIO()
                 final.save(image_stream, format="PNG")
                 images.append(imageio.imread(image_stream))
             else:
                 images.append(imageio.imread(image_data))
-                
+
             duration.append(
                 2000 if index == len(self._images[image_type]) - 1 else 200
             )  # 200 ms for all but the last frame
@@ -270,8 +280,16 @@ class WeerPlazaApi:
             if not os.path.exists(self.get_storage_path(image_type)):
                 os.makedirs(self.get_storage_path(image_type), exist_ok=True)
 
-    async def async_set_marker_location(self, latitude: float, longitude: float) -> None:
+    async def async_set_marker_location(
+        self, latitude: float | None, longitude: float | None
+    ) -> None:
         """Set the marker location."""
         self._latitude = latitude
         self._longitude = longitude
         _LOGGER.debug("Setting marker location to (%s, %s)", latitude, longitude)
+
+    async def async_request_refresh(self) -> None:
+        """Request a refresh of the images."""
+        _LOGGER.debug("Refreshing WeerPlaza images")
+        for image_type in IMAGE_URLS:
+            await self.async_create_animated_gif(image_type)

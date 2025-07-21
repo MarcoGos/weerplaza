@@ -9,13 +9,16 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DEFAULT_NAME, DOMAIN
 from .coordinator import WeerPlazaDataUpdateCoordinator
 
+
 @dataclass(frozen=True)
 class WeerPlazaCameraEntityDescription(CameraEntityDescription):
     """Describes Weer Plaza camera entity."""
+
     key: str | None = None
     translation_key: str | None = None
     icon: str | None = None
     image_type: str | None = None  # Default type, can be overridden
+
 
 DESCRIPTIONS: list[WeerPlazaCameraEntityDescription] = [
     WeerPlazaCameraEntityDescription(
@@ -37,6 +40,7 @@ DESCRIPTIONS: list[WeerPlazaCameraEntityDescription] = [
         image_type="thunder",
     ),
 ]
+
 
 async def async_setup_entry(
     hass: HomeAssistant,

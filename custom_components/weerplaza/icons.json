@@ -1,0 +1,6 @@
+{
+  "services": {
+    "set_marker_location": "mdi:map-marker-radius-outline",
+    "force_update": "mdi:update"
+  }
+}

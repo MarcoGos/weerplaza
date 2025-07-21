@@ -10,7 +10,6 @@ from .coordinator import WeerPlazaDataUpdateCoordinator
 from .const import (
     DOMAIN,
     SERVICE_SET_MARKER_LOCATION,
-
 )
 from .coordinator import DataUpdateCoordinator
 
@@ -21,6 +20,7 @@ SET_MARKER_LOCATION_SCHEMA = vol.Schema(
     }
 )
 
+
 class WeerPlazaServicesSetup:
     """Class to handle Integration Services."""
 
@@ -28,7 +28,9 @@ class WeerPlazaServicesSetup:
         """Initialise services."""
         self.hass = hass
         self.config_entry = config_entry
-        self.coordinator: WeerPlazaDataUpdateCoordinator = hass.data[DOMAIN][config_entry.entry_id]
+        self.coordinator: WeerPlazaDataUpdateCoordinator = hass.data[DOMAIN][
+            config_entry.entry_id
+        ]
 
         self.setup_services()
 
@@ -42,6 +44,12 @@ class WeerPlazaServicesSetup:
             schema=SET_MARKER_LOCATION_SCHEMA,
         )
 
+        self.hass.services.async_register(
+            DOMAIN,
+            "force_update",
+            self.force_update,
+        )
+
     async def set_marker_location(self, call: ServiceCall) -> None:
         """Set Marker Location service"""
         latitude = call.data.get("latitude")
@@ -52,3 +60,8 @@ class WeerPlazaServicesSetup:
 
         api = self.coordinator.api
         await api.async_set_marker_location(latitude, longitude)
+
+    async def force_update(self, call: ServiceCall) -> None:
+        """Force update service"""
+        api = self.coordinator.api
+        await api.async_request_refresh()

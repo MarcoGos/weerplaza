@@ -15,6 +15,16 @@
             "animated_thunder": {
                 "name": "Onweer Camera"
             }
+        },
+        "number": {
+            "latitude": {
+                "name": "Breedtegraad",
+                "description": "Stel de breedtegraad in voor de marker locatie."
+            },
+            "longitude": {
+                "name": "Lengtegraad",
+                "description": "Stel de lengtegraad in voor de marker locatie."
+            }
         }
     },
     "services": {
@@ -31,6 +41,10 @@
                     "description": "Lengtegraad van de marker locatie."
                 }
             }
+        },
+        "force_update": {
+            "name": "Forceer update",
+            "description": "Forceer een update van de Weerplaza gegevens."
         }
-        }
+    }
 }
