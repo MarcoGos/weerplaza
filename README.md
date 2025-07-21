@@ -20,6 +20,7 @@ Nothing to setup.
 ## What to expect
 
 The following images (cameras) will be registered:
-    - Radar Camera
-    - Satellite Camera
-    - Thunder Camera
+
+- Radar Camera
+- Satellite Camera
+- Thunder Camera
