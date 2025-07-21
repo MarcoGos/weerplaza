@@ -38,7 +38,7 @@ class WeerPlazaApi:
 
     def __init__(self, hass: HomeAssistant) -> None:
         self._hass = hass
-        self._timezone = timezone(self._hass.config.time_zone)
+        self._timezone = self._hass.config.time_zone
         self._latitude = hass.config.latitude
         self._longitude = hass.config.longitude
         self._session = async_get_clientsession(self._hass)
@@ -76,9 +76,7 @@ class WeerPlazaApi:
                             )
                             self.__add_filename_to_images(image_type, time_val)
 
-            await self._hass.async_add_executor_job(
-                self.__create_animated_gif, image_type
-            )
+            await self.async_create_animated_gif(image_type)
 
     async def __async_get_image_data(self, image_type: str) -> dict[str, Any] | None:
         """Fetch the latest image data."""
@@ -123,6 +121,12 @@ class WeerPlazaApi:
             f"custom_components/{DOMAIN}/images/Radar-1050-borders-v2.png"
         ) as image:
             return image.convert("RGBA")
+        
+    def __get_marker_image(self) -> Image.Image:
+        with Image.open(
+            f"custom_components/{DOMAIN}/images/pointer-50.png"
+        ) as image:
+            return image.convert("RGBA") #.resize((50, 50), Image.Resampling.LANCZOS)
 
     def __create_image(
         self, original: ImageFile.ImageFile, image_type: str, time_val: datetime
@@ -160,7 +164,7 @@ class WeerPlazaApi:
         )
 
         # Draw time
-        time_str = time_val.astimezone(self._timezone).strftime("%H:%M")
+        time_str = time_val.astimezone(timezone(self._timezone)).strftime("%H:%M")
         draw.text((textx, texty), time_str, font=font, fill=textcolor)
 
         # Draw copyright
@@ -198,11 +202,29 @@ class WeerPlazaApi:
             if os.path.exists(filename):
                 os.remove(filename)
 
+    async def async_create_animated_gif(self, image_type: str) -> None:
+        """Create an animated GIF from the images."""
+        await self._hass.async_add_executor_job(self.__create_animated_gif, image_type)
+
     def __create_animated_gif(self, image_type: str):
         images = []
         duration = []
         for index, image_data in enumerate(self._images[image_type]):
-            images.append(imageio.imread(image_data))
+            # Add marker location if set
+            if self._latitude and self._longitude:
+                final = Image.open(image_data).convert("RGBA")
+                marker = self.__get_marker_image()
+                # marker_x = int((self._longitude + 180) * (final.width / 360))
+                # marker_y = int((90 - self._latitude) * (final.height / 180))
+                marker_x = int(final.width / 2)
+                marker_y = int(final.height / 2)
+                final.paste(marker, (marker_x - int(marker.width / 2), marker_y - int(marker.height / 2)), marker)
+                image_stream = BytesIO()
+                final.save(image_stream, format="PNG")
+                images.append(imageio.imread(image_stream))
+            else:
+                images.append(imageio.imread(image_data))
+                
             duration.append(
                 2000 if index == len(self._images[image_type]) - 1 else 200
             )  # 200 ms for all but the last frame
