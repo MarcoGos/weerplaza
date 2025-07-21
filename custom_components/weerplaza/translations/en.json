@@ -20,16 +20,6 @@
             "animated_thunder": {
                 "name": "Thunder Camera"
             }
-        },
-        "number": {
-            "latitude": {
-                "name": "Latitude",
-                "description": "Set the latitude for the marker location."
-            },
-            "longitude": {
-                "name": "Longitude",
-                "description": "Set the longitude for the marker location."
-            }
         }
     },
     "services": {
