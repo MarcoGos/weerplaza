@@ -15,8 +15,22 @@
             "animated_thunder": {
                 "name": "Thunder Camera"
             }
-        },
-        "sensor": {
+        }
+    },
+    "services": {
+        "set_marker_location": {
+            "name": "Set Marker Location",
+            "description": "Set the marker location for the images.",
+            "fields": {
+                "latitude": {
+                    "name": "Latitude",
+                    "description": "Latitude of the marker location."
+                },
+                "longitude": {
+                    "name": "Longitude",
+                    "description": "Longitude of the marker location."
+                }
+            }
         }
     }
 }

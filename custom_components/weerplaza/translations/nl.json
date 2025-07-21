@@ -16,5 +16,21 @@
                 "name": "Onweer Camera"
             }
         }
-    }
+    },
+    "services": {
+        "set_marker_location": {
+            "name": "Stel marker locatie in",
+            "description": "Stel de marker locatie in voor de afbeeldingen.",
+            "fields": {
+                "latitude": {
+                    "name": "Breedtegraad",
+                    "description": "Breedtegraad van de marker locatie."
+                },
+                "longitude": {
+                    "name": "Lengtegraad",
+                    "description": "Lengtegraad van de marker locatie."
+                }
+            }
+        }
+        }
 }

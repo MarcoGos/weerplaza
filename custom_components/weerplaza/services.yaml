@@ -1,0 +1,8 @@
+set_marker_location:
+  fields:
+    latitude:
+      required: true
+      example: 52.00
+    longitude:
+      required: true
+      example: 6.00

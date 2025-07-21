@@ -39,6 +39,8 @@ class WeerPlazaApi:
     def __init__(self, hass: HomeAssistant) -> None:
         self._hass = hass
         self._timezone = timezone(self._hass.config.time_zone)
+        self._latitude = hass.config.latitude
+        self._longitude = hass.config.longitude
         self._session = async_get_clientsession(self._hass)
         self.__create_storage_paths()
 
@@ -67,7 +69,7 @@ class WeerPlazaApi:
                         original = Image.open(BytesIO(image_raw))
                         if original.width > 500:
                             await self._hass.async_add_executor_job(
-                                self.__create_large_image,
+                                self.__create_image,
                                 original,
                                 image_type,
                                 time_val,
@@ -122,7 +124,7 @@ class WeerPlazaApi:
         ) as image:
             return image.convert("RGBA")
 
-    def __create_large_image(
+    def __create_image(
         self, original: ImageFile.ImageFile, image_type: str, time_val: datetime
     ) -> bytes:
         # final image size is 1050x1148
@@ -245,3 +247,9 @@ class WeerPlazaApi:
             )
             if not os.path.exists(self.get_storage_path(image_type)):
                 os.makedirs(self.get_storage_path(image_type), exist_ok=True)
+
+    async def async_set_marker_location(self, latitude: float, longitude: float) -> None:
+        """Set the marker location."""
+        self._latitude = latitude
+        self._longitude = longitude
+        _LOGGER.debug("Setting marker location to (%s, %s)", latitude, longitude)
