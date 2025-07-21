@@ -129,7 +129,7 @@ class WeerPlazaApi:
 
     def __create_image(
         self, original: ImageFile.ImageFile, image_type: str, time_val: datetime
-    ) -> bytes:
+    ) -> None:
         # final image size is 1050x1148
         final = self.__get_background_image()
         # Resize original image to fit the final image
@@ -150,35 +150,24 @@ class WeerPlazaApi:
         draw = ImageDraw.Draw(final)
         # Colors
         textcolor = (254, 255, 255)
-        bgtextcolor = (12, 66, 156)
+        black = (0, 0, 0)
+
         # Font
-        font = ImageFont.load_default(20)
+        font = ImageFont.load_default(30)
 
-        textx = 3
-        texty = final.height - 30
-
-        # Draw background rectangle for text
-        draw.rectangle(
-            [0, final.height - 32, final.width, final.height], fill=bgtextcolor
-        )
+        textx = 10
+        texty = final.height - font.size - 10
 
         # Draw time
         time_str = time_val.astimezone(timezone(self._timezone)).strftime("%H:%M")
+        draw.text((textx + 1, texty), time_str, font=font, fill=black)
+        draw.text((textx + 1, texty + 1), time_str, font=font, fill=black)
         draw.text((textx, texty), time_str, font=font, fill=textcolor)
-
-        # Draw copyright
-        copyright_str = f"(c) {time_val.year} WeerPlaza.NL"
-        draw.text((textx + 62, texty), copyright_str, font=font, fill=textcolor)
 
         filename = self.__get_image_filename(image_type, time_val)
         final.save(filename, "PNG")
         mod_time = int(time_val.timestamp())
         os.utime(filename, (mod_time, mod_time))
-
-        img_byte_arr = BytesIO()
-        final.save(img_byte_arr, "PNG")
-
-        return img_byte_arr.getvalue()
 
     def __get_image_filename(self, image_type: str, time_val: datetime) -> str:
         """Get the filename of the latest image."""
@@ -192,6 +181,7 @@ class WeerPlazaApi:
 
     def __add_filename_to_images(self, image_type: str, time_val: datetime) -> None:
         self._images[image_type].append(self.__get_image_filename(image_type, time_val))
+        self._images[image_type].sort()
         self.__keep_last_images(image_type)
 
     def __keep_last_images(self, image_type: str):
@@ -200,6 +190,7 @@ class WeerPlazaApi:
             filename = self._images[image_type].pop(0)
             if os.path.exists(filename):
                 os.remove(filename)
+                _LOGGER.warning("Removed old image: %s", filename)
 
     async def async_create_animated_gif(self, image_type: str) -> None:
         """Create an animated GIF from the images."""
@@ -209,6 +200,8 @@ class WeerPlazaApi:
         images = []
         duration = []
         for index, image_data in enumerate(self._images[image_type]):
+            if not os.path.exists(image_data):
+                continue
             # Add marker location if set
             if self._latitude and self._longitude:
                 final = Image.open(image_data).convert("RGBA")

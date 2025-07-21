@@ -19,10 +19,10 @@ class WeerPlazaDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the API."""
 
     def __init__(
-        self, hass: HomeAssistant, client: WeerPlazaApi, device_info: DeviceInfo
+        self, hass: HomeAssistant, api: WeerPlazaApi, device_info: DeviceInfo
     ) -> None:
         """Initialize."""
-        self.api: WeerPlazaApi = client
+        self.api: WeerPlazaApi = api
         self.platforms: list[str] = []
         self.last_updated = None
         self.device_info = device_info
@@ -37,10 +37,11 @@ class WeerPlazaDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self) -> None:
         """Update data via library."""
-        try:
-            await self.api.async_get_new_images()
-        except Exception as exception:
-            _LOGGER.error(
-                "Error WeerPlazaDataUpdateCoordinator _async_update_data: %s", exception
-            )
-            raise UpdateFailed() from exception
+        await self.api.async_get_new_images()
+        # try:
+        #     await self.api.async_get_new_images()
+        # except Exception as exception:
+        #     _LOGGER.error(
+        #         "Error WeerPlazaDataUpdateCoordinator _async_update_data: %s", exception
+        #     )
+        #     raise UpdateFailed() from exception
