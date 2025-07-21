@@ -2,7 +2,7 @@
 
 # Weer Plaza
 
-This is a custom integration for Dutch Weer Plaza. It will provide an radarimage and animated radar images.
+This is a custom integration for Dutch Weer Plaza. It will provide animated images such as percipitation radar, satellite and thunder images.
 
 ## Installation
 
@@ -19,4 +19,7 @@ Nothing to setup.
 
 ## What to expect
 
-The following sensors will be registered:
+The following images (cameras) will be registered:
+    - Radar Camera
+    - Satellite Camera
+    - Thunder Camera
