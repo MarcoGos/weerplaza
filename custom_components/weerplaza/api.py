@@ -190,7 +190,7 @@ class WeerPlazaApi:
             filename = self._images[image_type].pop(0)
             if os.path.exists(filename):
                 os.remove(filename)
-                _LOGGER.warning("Removed old image: %s", filename)
+                _LOGGER.debug("Removed old image: %s", filename)
 
     async def async_create_animated_gif(self, image_type: str) -> None:
         """Create an animated GIF from the images."""
