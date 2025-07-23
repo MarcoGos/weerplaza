@@ -28,6 +28,11 @@
             "marker_longitude": {
                 "name": "Markering lengtegraad"
             }
+        },
+        "sensor": {
+            "last_updated": {
+                "name": "Laatst bijgewerkt"
+            }
         }
     },
     "services": {

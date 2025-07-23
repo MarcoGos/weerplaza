@@ -28,6 +28,11 @@
             "marker_longitude": {
                 "name": "Marker Longitude"
             }
+        },
+        "sensor": {
+            "last_updated": {
+                "name": "Last Updated"
+            }
         }
     },
     "services": {

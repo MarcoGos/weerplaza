@@ -1,8 +1,9 @@
-from datetime import timedelta
-from typing import Any
+from datetime import datetime, timedelta
 import logging
+from typing import Any
+from zoneinfo import ZoneInfo
 
-from homeassistant.helpers.update_coordinator import UpdateFailed, DataUpdateCoordinator
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.core import HomeAssistant
 
@@ -24,7 +25,6 @@ class WeerPlazaDataUpdateCoordinator(DataUpdateCoordinator):
         """Initialize."""
         self.api: WeerPlazaApi = api
         self.platforms: list[str] = []
-        self.last_updated = None
         self.device_info = device_info
         self._hass = hass
 
@@ -35,13 +35,11 @@ class WeerPlazaDataUpdateCoordinator(DataUpdateCoordinator):
             update_interval=timedelta(seconds=DEFAULT_SYNC_INTERVAL),
         )
 
-    async def _async_update_data(self) -> None:
+    async def _async_update_data(self) -> dict[str, Any]:
         """Update data via library."""
         await self.api.async_get_new_images()
-        # try:
-        #     await self.api.async_get_new_images()
-        # except Exception as exception:
-        #     _LOGGER.error(
-        #         "Error WeerPlazaDataUpdateCoordinator _async_update_data: %s", exception
-        #     )
-        #     raise UpdateFailed() from exception
+        return {
+            "last_updated": datetime.now().replace(
+                tzinfo=ZoneInfo(self._hass.config.time_zone)
+            )
+        }
