@@ -14,13 +14,13 @@ from .const import DOMAIN, NAME, MANUFACTURER
 from .coordinator import WeerPlazaDataUpdateCoordinator
 from .services import WeerPlazaServicesSetup
 
-PLATFORMS: list[Platform] = [Platform.CAMERA]  # , Platform.NUMBER]
+PLATFORMS: list[Platform] = [Platform.CAMERA, Platform.NUMBER]
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 
 
-async def async_setup(hass: HomeAssistant, config: Any) -> bool:
-    return True
+# async def async_setup(hass: HomeAssistant, config: Any) -> bool:
+#     return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

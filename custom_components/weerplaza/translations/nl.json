@@ -12,13 +12,21 @@
     "entity": {
         "camera": {
             "animated_radar": {
-                "name": "Neerslag Camera"
+                "name": "Neerslagradar"
             },
             "animated_satellite": {
-                "name": "Satelliet Camera"
+                "name": "Satellietbeelden"
             },
             "animated_thunder": {
-                "name": "Onweer Camera"
+                "name": "Onweer"
+            }
+        },
+        "number": {
+            "latitude": {
+                "name": "Breedtegraad"
+            },
+            "longitude": {
+                "name": "Lengtegraad"
             }
         }
     },
@@ -39,7 +47,7 @@
         },
         "force_update": {
             "name": "Forceer update",
-            "description": "Forceer een update van de Weerplaza gegevens."
+            "description": "Forceer een update van de Weerplaza beelden."
         }
     }
 }

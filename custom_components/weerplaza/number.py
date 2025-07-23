@@ -1,0 +1,94 @@
+from homeassistant.components.number import NumberEntity, NumberEntityDescription
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import EntityCategory
+from homeassistant.core import HomeAssistant
+from homeassistant.components.number.const import DOMAIN as NUMBER_DOMAIN, NumberMode
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+
+from .coordinator import WeerPlazaDataUpdateCoordinator
+from .const import DOMAIN, DEFAULT_NAME, LATITUDE, LONGITUDE
+
+DESCRIPTIONS: list[NumberEntityDescription] = [
+    NumberEntityDescription(
+        key=LATITUDE,
+        translation_key=LATITUDE,
+        entity_category=EntityCategory.CONFIG,
+        icon="mdi:latitude",
+        native_min_value=-180,
+        native_max_value=180,
+        mode=NumberMode.BOX,
+    ),
+    NumberEntityDescription(
+        key=LONGITUDE,
+        translation_key=LONGITUDE,
+        entity_category=EntityCategory.CONFIG,
+        icon="mdi:longitude",
+        native_min_value=-90,
+        native_max_value=90,
+        mode=NumberMode.BOX,
+    ),
+]
+
+
+async def async_setup_entry(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    async_add_entities: AddConfigEntryEntitiesCallback,
+) -> None:
+    """Set up Weer Plaza numbers based on a config entry."""
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+
+    entities: list[WeerPlazaNumber] = []
+
+    # Add all numbers described above.
+    for description in DESCRIPTIONS:
+        entities.append(
+            WeerPlazaNumber(
+                coordinator=coordinator,
+                entry_id=entry.entry_id,
+                description=description,
+                hass=hass,
+            )
+        )
+
+    async_add_entities(entities)
+
+
+class WeerPlazaNumber(NumberEntity):
+    """Representation of a Weer Plaza number entity."""
+
+    def __init__(
+        self,
+        coordinator: WeerPlazaDataUpdateCoordinator,
+        entry_id: str,
+        description: NumberEntityDescription,
+        hass: HomeAssistant,
+    ) -> None:
+        """Initialize the number entity."""
+        super().__init__()
+        self._coordinator = coordinator
+        self._hass = hass
+        self.entity_description = description
+        self.entity_id = f"{NUMBER_DOMAIN}.{DEFAULT_NAME}_{description.key}".lower()
+        self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {description.key}"
+        self._attr_device_info = coordinator.device_info
+
+    @property
+    def native_value(self) -> float | None:
+        """Return the current value of the number."""
+        latitude, longitude = self._coordinator.api.async_get_marker_location()
+        key = self.entity_description.key
+        if key == LATITUDE:
+            return latitude
+        elif key == LONGITUDE:
+            return longitude
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Set the number value."""
+        latitude, longitude = self._coordinator.api.async_get_marker_location()
+        key = self.entity_description.key
+        if key == LATITUDE:
+            latitude = value
+        elif key == LONGITUDE:
+            longitude = value
+        await self._coordinator.api.async_set_marker_location(latitude, longitude)

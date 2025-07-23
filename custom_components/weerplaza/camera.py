@@ -36,7 +36,7 @@ DESCRIPTIONS: list[WeerPlazaCameraEntityDescription] = [
     WeerPlazaCameraEntityDescription(
         key="animated_thunder",
         translation_key="animated_thunder",
-        icon="mdi:thunderstorm",
+        icon="mdi:lightning-bolt-outline",
         image_type="thunder",
     ),
 ]

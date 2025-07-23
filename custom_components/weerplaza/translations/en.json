@@ -20,6 +20,14 @@
             "animated_thunder": {
                 "name": "Thunder Camera"
             }
+        },
+        "number": {
+            "latitude": {
+                "name": "Latitude"
+            },
+            "longitude": {
+                "name": "Longitude"
+            }
         }
     },
     "services": {

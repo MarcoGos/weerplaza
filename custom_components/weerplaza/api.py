@@ -156,7 +156,7 @@ class WeerPlazaApi:
         font = ImageFont.load_default(30)
 
         textx = 10
-        texty = final.height - font.size - 10
+        texty = final.height - font.size - 10  # type: ignore
 
         # Draw time
         time_str = time_val.astimezone(timezone(self._timezone)).strftime("%H:%M")
@@ -277,9 +277,15 @@ class WeerPlazaApi:
         self, latitude: float | None, longitude: float | None
     ) -> None:
         """Set the marker location."""
-        self._latitude = latitude
-        self._longitude = longitude
+        if latitude:
+            self._latitude = latitude
+        if longitude:
+            self._longitude = longitude
         _LOGGER.debug("Setting marker location to (%s, %s)", latitude, longitude)
+
+    def async_get_marker_location(self) -> tuple[float | None, float | None]:
+        """Get the marker location."""
+        return (self._latitude, self._longitude)
 
     async def async_request_refresh(self) -> None:
         """Request a refresh of the images."""
