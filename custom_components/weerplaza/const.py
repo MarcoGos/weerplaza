@@ -1,5 +1,7 @@
 """Constants for the Weer Plaza integration."""
 
+from enum import Enum
+
 NAME = "Weer Plaza"
 DOMAIN = "weerplaza"
 MANUFACTURER = "weerplaza"
@@ -12,7 +14,16 @@ DEFAULT_SYNC_INTERVAL = 300  # seconds
 
 DEFAULT_NAME = NAME
 
-SERVICE_SET_MARKER_LOCATION = "set_marker_location"
+MARKER_LATITUDE = "marker_latitude"
+MARKER_LONGITUDE = "marker_longitude"
+PRECIPITATION_RADAR = "precipitation_radar"
+SATELLITE = "satellite"
+THUNDER = "thunder"
 
-LATITUDE = "latitude"
-LONGITUDE = "longitude"
+
+class ImageType(Enum):
+    """Enum for image types."""
+
+    RADAR = "radar"
+    SATELLITE = "satellite"
+    THUNDER = "thunder"

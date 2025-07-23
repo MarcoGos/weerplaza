@@ -24,3 +24,7 @@ The following images (cameras) will be registered:
 - Radar Camera
 - Satellite Camera
 - Thunder Camera
+
+A latitude and longitude value can be set to show a marker on de images.
+
+A service is available called "Force Update" to update the marker on the images after the latitude and/or longitude values changed.

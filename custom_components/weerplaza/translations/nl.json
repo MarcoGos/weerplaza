@@ -11,40 +11,26 @@
     },
     "entity": {
         "camera": {
-            "animated_radar": {
+            "precipitation_radar": {
                 "name": "Neerslagradar"
             },
-            "animated_satellite": {
+            "satellite": {
                 "name": "Satellietbeelden"
             },
-            "animated_thunder": {
+            "thunder": {
                 "name": "Onweer"
             }
         },
         "number": {
-            "latitude": {
-                "name": "Breedtegraad"
+            "marker_latitude": {
+                "name": "Markering breedtegraad"
             },
-            "longitude": {
-                "name": "Lengtegraad"
+            "marker_longitude": {
+                "name": "Markering lengtegraad"
             }
         }
     },
     "services": {
-        "set_marker_location": {
-            "name": "Stel marker locatie in",
-            "description": "Stel de marker locatie in voor de afbeeldingen.",
-            "fields": {
-                "latitude": {
-                    "name": "Breedtegraad",
-                    "description": "Breedtegraad van de marker locatie."
-                },
-                "longitude": {
-                    "name": "Lengtegraad",
-                    "description": "Lengtegraad van de marker locatie."
-                }
-            }
-        },
         "force_update": {
             "name": "Forceer update",
             "description": "Forceer een update van de Weerplaza beelden."

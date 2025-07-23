@@ -6,38 +6,45 @@ from homeassistant.components.camera.const import DOMAIN as CAMERA_DOMAIN
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DEFAULT_NAME, DOMAIN
+from .const import (
+    DEFAULT_NAME,
+    DOMAIN,
+    PRECIPITATION_RADAR,
+    SATELLITE,
+    THUNDER,
+    ImageType,
+)
 from .coordinator import WeerPlazaDataUpdateCoordinator
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class WeerPlazaCameraEntityDescription(CameraEntityDescription):
     """Describes Weer Plaza camera entity."""
 
     key: str | None = None
     translation_key: str | None = None
     icon: str | None = None
-    image_type: str | None = None  # Default type, can be overridden
+    image_type: ImageType | None = None  # Default type, can be overridden
 
 
 DESCRIPTIONS: list[WeerPlazaCameraEntityDescription] = [
     WeerPlazaCameraEntityDescription(
-        key="animated_radar",
-        translation_key="animated_radar",
+        key=PRECIPITATION_RADAR,
+        translation_key=PRECIPITATION_RADAR,
         icon="mdi:radar",
-        image_type="radar",
+        image_type=ImageType.RADAR,
     ),
     WeerPlazaCameraEntityDescription(
-        key="animated_satellite",
-        translation_key="animated_satellite",
+        key=SATELLITE,
+        translation_key=SATELLITE,
         icon="mdi:satellite",
-        image_type="satellite",
+        image_type=ImageType.SATELLITE,
     ),
     WeerPlazaCameraEntityDescription(
-        key="animated_thunder",
-        translation_key="animated_thunder",
+        key=THUNDER,
+        translation_key=THUNDER,
         icon="mdi:lightning-bolt-outline",
-        image_type="thunder",
+        image_type=ImageType.THUNDER,
     ),
 ]
 
@@ -69,10 +76,6 @@ async def async_setup_entry(
 class WeerPlazaCamera(CoordinatorEntity[WeerPlazaDataUpdateCoordinator], Camera):
     """Defines the radar weer plaza camera."""
 
-    _attr_has_entity_name = True
-    _attr_content_type = "image/gif"
-    entity_description: WeerPlazaCameraEntityDescription
-
     def __init__(
         self,
         coordinator: WeerPlazaDataUpdateCoordinator,
@@ -88,12 +91,14 @@ class WeerPlazaCamera(CoordinatorEntity[WeerPlazaDataUpdateCoordinator], Camera)
         self.entity_id = f"{CAMERA_DOMAIN}.{DEFAULT_NAME}_{description.key}".lower()
         self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {description.key}"
         self._hass = hass
+        self._attr_content_type = "image/gif"
         self._attr_device_info = coordinator.device_info
+        self._attr_has_entity_name = True
 
     async def async_camera_image(
         self, width: int | None = None, height: int | None = None
     ) -> bytes | None:
         """Return bytes of camera image or None."""
-        image_type = self.entity_description.image_type or "radar"
+        image_type = self.entity_description.image_type or ImageType.RADAR  # type: ignore
         image = await self.coordinator.api.async_get_animated_image(image_type)
         return image

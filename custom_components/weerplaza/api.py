@@ -16,16 +16,16 @@ from homeassistant.helpers.storage import STORAGE_DIR
 from PIL import Image, ImageFile, ImageDraw, ImageFont
 import imageio.v2 as imageio
 
-from .const import DOMAIN
+from .const import DOMAIN, ImageType
 from .tools import calculate_mercator_position
 
 TIMEOUT = 10
 IMAGES_TO_KEEP = 18
 
 IMAGE_URLS = {
-    "radar": "https://api.meteoplaza.com/v2/splash/10728/obs?access_token=weerplaza&usehd=1",
-    "satellite": "https://api.meteoplaza.com/v2/splash/10728/sat?access_token=weerplaza&usehd=1",
-    "thunder": "https://api.meteoplaza.com/v2/splash/10728/thunder?access_token=weerplaza&usehd=1",
+    ImageType.RADAR: "https://api.meteoplaza.com/v2/splash/10728/obs?access_token=weerplaza&usehd=1",
+    ImageType.SATELLITE: "https://api.meteoplaza.com/v2/splash/10728/sat?access_token=weerplaza&usehd=1",
+    ImageType.THUNDER: "https://api.meteoplaza.com/v2/splash/10728/thunder?access_token=weerplaza&usehd=1",
 }
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
@@ -33,8 +33,8 @@ _LOGGER: logging.Logger = logging.getLogger(__package__)
 
 class WeerPlazaApi:
     _headers: dict[str, str] = {"User-Agent": "Home Assistant (Weer Plaza)"}
-    _images: dict[str, Any] = {}
-    _storage_paths: dict[str, str] = {}
+    _images: dict[ImageType, Any] = {}
+    _storage_paths: dict[ImageType, str] = {}
     _timezone: Any = None
 
     def __init__(self, hass: HomeAssistant) -> None:
@@ -79,7 +79,9 @@ class WeerPlazaApi:
 
             await self.async_create_animated_gif(image_type)
 
-    async def __async_get_image_data(self, image_type: str) -> dict[str, Any] | None:
+    async def __async_get_image_data(
+        self, image_type: ImageType
+    ) -> dict[str, Any] | None:
         """Fetch the latest image data."""
         try:
             async with async_timeout.timeout(TIMEOUT):
@@ -128,7 +130,7 @@ class WeerPlazaApi:
             return image.convert("RGBA")  # .resize((50, 50), Image.Resampling.LANCZOS)
 
     def __create_image(
-        self, original: ImageFile.ImageFile, image_type: str, time_val: datetime
+        self, original: ImageFile.ImageFile, image_type: ImageType, time_val: datetime
     ) -> None:
         # final image size is 1050x1148
         final = self.__get_background_image()
@@ -169,22 +171,24 @@ class WeerPlazaApi:
         mod_time = int(time_val.timestamp())
         os.utime(filename, (mod_time, mod_time))
 
-    def __get_image_filename(self, image_type: str, time_val: datetime) -> str:
+    def __get_image_filename(self, image_type: ImageType, time_val: datetime) -> str:
         """Get the filename of the latest image."""
         return f"{self.get_storage_path(image_type)}/{time_val.strftime('%Y%m%d-%H%M')}.png"
 
-    def __image_needed(self, image_type: str, time_val: datetime) -> bool:
+    def __image_needed(self, image_type: ImageType, time_val: datetime) -> bool:
         """Check if the image is needed based on the time."""
         if time_val.timestamp() > (datetime.now() - timedelta(hours=12)).timestamp():
             return not os.path.exists(self.__get_image_filename(image_type, time_val))
         return False
 
-    def __add_filename_to_images(self, image_type: str, time_val: datetime) -> None:
+    def __add_filename_to_images(
+        self, image_type: ImageType, time_val: datetime
+    ) -> None:
         self._images[image_type].append(self.__get_image_filename(image_type, time_val))
         self._images[image_type].sort()
         self.__keep_last_images(image_type)
 
-    def __keep_last_images(self, image_type: str):
+    def __keep_last_images(self, image_type: ImageType):
         """Keep only the last IMAGES_TO_KEEP images."""
         while len(self._images[image_type]) > IMAGES_TO_KEEP:
             filename = self._images[image_type].pop(0)
@@ -192,11 +196,11 @@ class WeerPlazaApi:
                 os.remove(filename)
                 _LOGGER.debug("Removed old image: %s", filename)
 
-    async def async_create_animated_gif(self, image_type: str) -> None:
+    async def async_create_animated_gif(self, image_type: ImageType) -> None:
         """Create an animated GIF from the images."""
         await self._hass.async_add_executor_job(self.__create_animated_gif, image_type)
 
-    def __create_animated_gif(self, image_type: str):
+    def __create_animated_gif(self, image_type: ImageType):
         images = []
         duration = []
         for index, image_data in enumerate(self._images[image_type]):
@@ -210,8 +214,8 @@ class WeerPlazaApi:
                     self._latitude,
                     self._longitude,
                     llon=1.556,
-                    rlon=8.8,  # 8.972,
-                    tlat=54.239,  # 54.239,
+                    rlon=8.8,
+                    tlat=54.239,
                     width=final.width,
                 )
                 final.paste(
@@ -238,7 +242,7 @@ class WeerPlazaApi:
             duration=duration,
         )
 
-    def __build_images_list(self, image_type):
+    def __build_images_list(self, image_type: ImageType) -> None:
         """Build the list of images from the storage path."""
         self._images[image_type] = []
         files = glob.glob(os.path.join(self.get_storage_path(image_type), "*.png"))
@@ -247,13 +251,13 @@ class WeerPlazaApi:
             self._images[image_type].append(file)
         self.__keep_last_images(image_type)
 
-    async def async_get_animated_image(self, image_type: str) -> bytes | None:
+    async def async_get_animated_image(self, image_type: ImageType) -> bytes | None:
         """Get the animated image."""
         return await self._hass.async_add_executor_job(
             self.get_animated_image, image_type
         )
 
-    def get_animated_image(self, image_type) -> bytes | None:
+    def get_animated_image(self, image_type: ImageType) -> bytes | None:
         """Get the animated image."""
         animated_path = f"{self.get_storage_path(image_type)}/animated.gif"
         if os.path.exists(animated_path):
@@ -261,14 +265,14 @@ class WeerPlazaApi:
                 return image_file.read()
         return None
 
-    def get_storage_path(self, image_type: str) -> str:
+    def get_storage_path(self, image_type: ImageType) -> str:
         """Get the storage path for the given image type."""
         return self._storage_paths.get(image_type, "")
 
     def __create_storage_paths(self):
         for image_type in IMAGE_URLS:
             self._storage_paths[image_type] = self._hass.config.path(
-                STORAGE_DIR, DOMAIN, image_type
+                STORAGE_DIR, DOMAIN, image_type.value
             )
             if not os.path.exists(self.get_storage_path(image_type)):
                 os.makedirs(self.get_storage_path(image_type), exist_ok=True)

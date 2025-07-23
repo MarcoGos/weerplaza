@@ -6,12 +6,12 @@ from homeassistant.components.number.const import DOMAIN as NUMBER_DOMAIN, Numbe
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .coordinator import WeerPlazaDataUpdateCoordinator
-from .const import DOMAIN, DEFAULT_NAME, LATITUDE, LONGITUDE
+from .const import DOMAIN, DEFAULT_NAME, MARKER_LATITUDE, MARKER_LONGITUDE
 
 DESCRIPTIONS: list[NumberEntityDescription] = [
     NumberEntityDescription(
-        key=LATITUDE,
-        translation_key=LATITUDE,
+        key=MARKER_LATITUDE,
+        translation_key=MARKER_LATITUDE,
         entity_category=EntityCategory.CONFIG,
         icon="mdi:latitude",
         native_min_value=-180,
@@ -19,8 +19,8 @@ DESCRIPTIONS: list[NumberEntityDescription] = [
         mode=NumberMode.BOX,
     ),
     NumberEntityDescription(
-        key=LONGITUDE,
-        translation_key=LONGITUDE,
+        key=MARKER_LONGITUDE,
+        translation_key=MARKER_LONGITUDE,
         entity_category=EntityCategory.CONFIG,
         icon="mdi:longitude",
         native_min_value=-90,
@@ -72,23 +72,24 @@ class WeerPlazaNumber(NumberEntity):
         self.entity_id = f"{NUMBER_DOMAIN}.{DEFAULT_NAME}_{description.key}".lower()
         self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {description.key}"
         self._attr_device_info = coordinator.device_info
+        self._attr_has_entity_name = True
 
     @property
     def native_value(self) -> float | None:
         """Return the current value of the number."""
         latitude, longitude = self._coordinator.api.async_get_marker_location()
         key = self.entity_description.key
-        if key == LATITUDE:
+        if key == MARKER_LATITUDE:
             return latitude
-        elif key == LONGITUDE:
+        elif key == MARKER_LONGITUDE:
             return longitude
 
     async def async_set_native_value(self, value: float) -> None:
         """Set the number value."""
         latitude, longitude = self._coordinator.api.async_get_marker_location()
         key = self.entity_description.key
-        if key == LATITUDE:
+        if key == MARKER_LATITUDE:
             latitude = value
-        elif key == LONGITUDE:
+        elif key == MARKER_LONGITUDE:
             longitude = value
         await self._coordinator.api.async_set_marker_location(latitude, longitude)

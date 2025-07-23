@@ -11,40 +11,26 @@
     },
     "entity": {
         "camera": {
-            "animated_radar": {
-                "name": "Radar Camera"
+            "precipitation_radar": {
+                "name": "Precipitation Radar"
             },
-            "animated_satellite": {
-                "name": "Satellite Camera"
+            "satellite": {
+                "name": "Satellite"
             },
-            "animated_thunder": {
-                "name": "Thunder Camera"
+            "thunder": {
+                "name": "Thunder"
             }
         },
         "number": {
-            "latitude": {
-                "name": "Latitude"
+            "marker_latitude": {
+                "name": "Marker Latitude"
             },
-            "longitude": {
-                "name": "Longitude"
+            "marker_longitude": {
+                "name": "Marker Longitude"
             }
         }
     },
     "services": {
-        "set_marker_location": {
-            "name": "Set Marker Location",
-            "description": "Set the marker location for the images.",
-            "fields": {
-                "latitude": {
-                    "name": "Latitude",
-                    "description": "Latitude of the marker location."
-                },
-                "longitude": {
-                    "name": "Longitude",
-                    "description": "Longitude of the marker location."
-                }
-            }
-        },
         "force_update": {
             "name": "Force Update",
             "description": "Force an update of the Weerplaza images."

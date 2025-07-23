@@ -1,15 +1,1 @@
-set_marker_location:
-  fields:
-    latitude:
-      required: true
-      example: 52.00
-      selector:
-        number:
-          mode: box
-    longitude:
-      required: true
-      example: 6.00
-      selector:
-        number:
-          mode: box
 force_update:

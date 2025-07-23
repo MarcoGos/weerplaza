@@ -7,18 +7,7 @@ from homeassistant.core import HomeAssistant, ServiceCall
 
 from .coordinator import WeerPlazaDataUpdateCoordinator
 
-from .const import (
-    DOMAIN,
-    SERVICE_SET_MARKER_LOCATION,
-)
-from .coordinator import DataUpdateCoordinator
-
-SET_MARKER_LOCATION_SCHEMA = vol.Schema(
-    {
-        vol.Required("latitude"): float,
-        vol.Required("longitude"): float,
-    }
-)
+from .const import DOMAIN
 
 
 class WeerPlazaServicesSetup:
@@ -39,27 +28,9 @@ class WeerPlazaServicesSetup:
 
         self.hass.services.async_register(
             DOMAIN,
-            SERVICE_SET_MARKER_LOCATION,
-            self.set_marker_location,
-            schema=SET_MARKER_LOCATION_SCHEMA,
-        )
-
-        self.hass.services.async_register(
-            DOMAIN,
             "force_update",
             self.force_update,
         )
-
-    async def set_marker_location(self, call: ServiceCall) -> None:
-        """Set Marker Location service"""
-        latitude = call.data.get("latitude")
-        longitude = call.data.get("longitude")
-
-        if latitude is None or longitude is None:
-            raise ValueError("Latitude and Longitude must be provided.")
-
-        api = self.coordinator.api
-        await api.async_set_marker_location(latitude, longitude)
 
     async def force_update(self, call: ServiceCall) -> None:
         """Force update service"""
