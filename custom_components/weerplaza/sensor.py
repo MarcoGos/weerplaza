@@ -47,8 +47,6 @@ async def async_setup_entry(
 class WeerPlazaSensor(CoordinatorEntity[WeerPlazaDataUpdateCoordinator], SensorEntity):
     """Defines a Weer Plaza sensor."""
 
-    _attr_has_entity_name = True
-
     def __init__(
         self,
         coordinator: WeerPlazaDataUpdateCoordinator,
@@ -57,10 +55,11 @@ class WeerPlazaSensor(CoordinatorEntity[WeerPlazaDataUpdateCoordinator], SensorE
     ) -> None:
         """Initialize Weer Plaza sensor."""
         super().__init__(coordinator=coordinator)
-        self.entity_description = description
-        self.entity_id = f"{SENSOR_DOMAIN}.{DEFAULT_NAME} {description.key}".lower()
-        self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {description.key}"
         self._attr_device_info = coordinator.device_info
+        self._attr_has_entity_name = True
+        self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {description.key}"
+        self.entity_description = description
+        self.entity_id = f"{SENSOR_DOMAIN}.{DEFAULT_NAME} {description.key}"
 
     @property
     def native_value(self) -> StateType:  # type: ignore

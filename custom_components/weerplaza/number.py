@@ -66,13 +66,13 @@ class WeerPlazaNumber(NumberEntity):
     ) -> None:
         """Initialize the number entity."""
         super().__init__()
+        self._attr_device_info = coordinator.device_info
+        self._attr_has_entity_name = True
+        self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {description.key}"
         self._coordinator = coordinator
         self._hass = hass
         self.entity_description = description
-        self.entity_id = f"{NUMBER_DOMAIN}.{DEFAULT_NAME}_{description.key}".lower()
-        self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {description.key}"
-        self._attr_device_info = coordinator.device_info
-        self._attr_has_entity_name = True
+        self.entity_id = f"{NUMBER_DOMAIN}.{DEFAULT_NAME}_{description.key}"
 
     @property
     def native_value(self) -> float | None:

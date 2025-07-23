@@ -24,7 +24,7 @@ class WeerPlazaCameraEntityDescription(CameraEntityDescription):
     key: str | None = None
     translation_key: str | None = None
     icon: str | None = None
-    image_type: ImageType | None = None  # Default type, can be overridden
+    image_type: ImageType
 
 
 DESCRIPTIONS: list[WeerPlazaCameraEntityDescription] = [
@@ -87,13 +87,13 @@ class WeerPlazaCamera(CoordinatorEntity[WeerPlazaDataUpdateCoordinator], Camera)
         Camera.__init__(self)
         super().__init__(coordinator=coordinator)
 
-        self.entity_description = description
-        self.entity_id = f"{CAMERA_DOMAIN}.{DEFAULT_NAME}_{description.key}".lower()
-        self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {description.key}"
-        self._hass = hass
         self._attr_content_type = "image/gif"
         self._attr_device_info = coordinator.device_info
         self._attr_has_entity_name = True
+        self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {description.key}"
+        self._hass = hass
+        self.entity_description = description
+        self.entity_id = f"{CAMERA_DOMAIN}.{DEFAULT_NAME}_{description.key}"
 
     async def async_camera_image(
         self, width: int | None = None, height: int | None = None

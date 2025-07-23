@@ -36,7 +36,7 @@ class WeerPlazaDataUpdateCoordinator(DataUpdateCoordinator):
         )
 
     async def _async_update_data(self) -> dict[str, Any]:
-        """Update data via library."""
+        """Update data via api."""
         await self.api.async_get_new_images()
         return {
             "last_updated": datetime.now().replace(
