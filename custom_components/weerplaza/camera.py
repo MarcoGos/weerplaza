@@ -15,6 +15,7 @@ from .const import (
     ImageType,
 )
 from .coordinator import WeerPlazaDataUpdateCoordinator
+from .entity import WeerPlazaEntity
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -66,14 +67,13 @@ async def async_setup_entry(
                 coordinator=coordinator,
                 entry_id=entry.entry_id,
                 description=description,
-                hass=hass,
             )
         )
 
     async_add_entities(entities)
 
 
-class WeerPlazaCamera(CoordinatorEntity[WeerPlazaDataUpdateCoordinator], Camera):
+class WeerPlazaCamera(WeerPlazaEntity, Camera):
     """Defines the radar weer plaza camera."""
 
     def __init__(
@@ -81,18 +81,14 @@ class WeerPlazaCamera(CoordinatorEntity[WeerPlazaDataUpdateCoordinator], Camera)
         coordinator: WeerPlazaDataUpdateCoordinator,
         entry_id: str,
         description: WeerPlazaCameraEntityDescription,
-        hass: HomeAssistant,
     ) -> None:
         """Initialize Weer Plaza camera."""
         Camera.__init__(self)
-        super().__init__(coordinator=coordinator)
+        super().__init__(
+            coordinator=coordinator, entity_description=description, entry_id=entry_id
+        )
 
         self._attr_content_type = "image/gif"
-        self._attr_device_info = coordinator.device_info
-        self._attr_has_entity_name = True
-        self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {description.key}"
-        self._hass = hass
-        self.entity_description = description
         self.entity_id = f"{CAMERA_DOMAIN}.{DEFAULT_NAME}_{description.key}"
 
     async def async_camera_image(

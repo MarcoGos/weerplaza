@@ -32,20 +32,23 @@ _LOGGER: logging.Logger = logging.getLogger(__package__)
 
 
 class WeerPlazaApi:
+    """WeerPlaza API client to fetch weather images."""
+
     _headers: dict[str, str] = {"User-Agent": "Home Assistant (Weer Plaza)"}
     _images: dict[ImageType, Any] = {}
     _storage_paths: dict[ImageType, str] = {}
     _timezone: Any = None
 
-    def __init__(self, hass: HomeAssistant) -> None:
+    def __init__(self, hass: HomeAssistant, latitude: float, longitude: float) -> None:
         self._hass = hass
         self._timezone = self._hass.config.time_zone
-        self._latitude = hass.config.latitude
-        self._longitude = hass.config.longitude
+        self._latitude = latitude
+        self._longitude = longitude
         self._session = async_get_clientsession(self._hass)
         self.__create_storage_paths()
 
     async def async_get_new_images(self) -> None:
+        """Fetch new images from the WeerPlaza API."""
         for image_type, file_path in IMAGE_URLS.items():
             if not file_path:
                 continue

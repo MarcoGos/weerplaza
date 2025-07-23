@@ -24,18 +24,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if hass.data.get(DOMAIN) is None:
         hass.data.setdefault(DOMAIN, {})
 
-    _LOGGER.debug(f"entry.data: {entry.data}")
+    _LOGGER.debug("entry.data: %s", entry.data)
 
-    api = WeerPlazaApi(hass)
-
-    device_info = DeviceInfo(
-        identifiers={(DOMAIN, entry.entry_id)},
-        manufacturer=MANUFACTURER,
-        name=NAME,
-    )
+    api = WeerPlazaApi(hass, hass.config.latitude, hass.config.longitude)
 
     hass.data[DOMAIN][entry.entry_id] = coordinator = WeerPlazaDataUpdateCoordinator(
-        hass=hass, api=api, device_info=device_info
+        hass=hass,
+        api=api,
     )
 
     await coordinator.async_config_entry_first_refresh()

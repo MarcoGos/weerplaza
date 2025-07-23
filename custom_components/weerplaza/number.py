@@ -1,3 +1,5 @@
+"""WeerPlaza Number Entities"""
+
 from homeassistant.components.number import NumberEntity, NumberEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
@@ -7,6 +9,7 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .coordinator import WeerPlazaDataUpdateCoordinator
 from .const import DOMAIN, DEFAULT_NAME, MARKER_LATITUDE, MARKER_LONGITUDE
+from .entity import WeerPlazaEntity
 
 DESCRIPTIONS: list[NumberEntityDescription] = [
     NumberEntityDescription(
@@ -47,14 +50,13 @@ async def async_setup_entry(
                 coordinator=coordinator,
                 entry_id=entry.entry_id,
                 description=description,
-                hass=hass,
             )
         )
 
     async_add_entities(entities)
 
 
-class WeerPlazaNumber(NumberEntity):
+class WeerPlazaNumber(WeerPlazaEntity, NumberEntity):
     """Representation of a Weer Plaza number entity."""
 
     def __init__(
@@ -62,22 +64,17 @@ class WeerPlazaNumber(NumberEntity):
         coordinator: WeerPlazaDataUpdateCoordinator,
         entry_id: str,
         description: NumberEntityDescription,
-        hass: HomeAssistant,
     ) -> None:
         """Initialize the number entity."""
-        super().__init__()
-        self._attr_device_info = coordinator.device_info
-        self._attr_has_entity_name = True
-        self._attr_unique_id = f"{entry_id}-{DEFAULT_NAME} {description.key}"
-        self._coordinator = coordinator
-        self._hass = hass
-        self.entity_description = description
+        super().__init__(
+            coordinator=coordinator, entity_description=description, entry_id=entry_id
+        )
         self.entity_id = f"{NUMBER_DOMAIN}.{DEFAULT_NAME}_{description.key}"
 
     @property
     def native_value(self) -> float | None:
         """Return the current value of the number."""
-        latitude, longitude = self._coordinator.api.async_get_marker_location()
+        latitude, longitude = self.coordinator.api.async_get_marker_location()
         key = self.entity_description.key
         if key == MARKER_LATITUDE:
             return latitude
@@ -86,10 +83,10 @@ class WeerPlazaNumber(NumberEntity):
 
     async def async_set_native_value(self, value: float) -> None:
         """Set the number value."""
-        latitude, longitude = self._coordinator.api.async_get_marker_location()
+        latitude, longitude = self.coordinator.api.async_get_marker_location()
         key = self.entity_description.key
         if key == MARKER_LATITUDE:
             latitude = value
         elif key == MARKER_LONGITUDE:
             longitude = value
-        await self._coordinator.api.async_set_marker_location(latitude, longitude)
+        await self.coordinator.api.async_set_marker_location(latitude, longitude)

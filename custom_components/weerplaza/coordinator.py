@@ -1,3 +1,5 @@
+"""WeerPlaza Data Update Coordinator"""
+
 from datetime import datetime, timedelta
 import logging
 from typing import Any
@@ -20,12 +22,13 @@ class WeerPlazaDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the API."""
 
     def __init__(
-        self, hass: HomeAssistant, api: WeerPlazaApi, device_info: DeviceInfo
+        self,
+        hass: HomeAssistant,
+        api: WeerPlazaApi,
     ) -> None:
         """Initialize."""
         self.api: WeerPlazaApi = api
         self.platforms: list[str] = []
-        self.device_info = device_info
         self._hass = hass
 
         super().__init__(

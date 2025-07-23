@@ -1,12 +1,9 @@
 """Global services file."""
 
-import voluptuous as vol
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
 
 from .coordinator import WeerPlazaDataUpdateCoordinator
-
 from .const import DOMAIN
 
 
