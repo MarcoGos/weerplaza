@@ -3,6 +3,7 @@ from typing import Any
 import os
 import glob
 import logging
+from zoneinfo import ZoneInfo
 from io import BytesIO
 
 from datetime import datetime, timedelta
@@ -16,7 +17,14 @@ from homeassistant.helpers.storage import STORAGE_DIR
 from PIL import Image, ImageFile, ImageDraw, ImageFont
 import imageio.v2 as imageio
 
-from .const import DOMAIN, MARKER_LATITUDE, MARKER_LONGITUDE, SHOW_MARKER, ImageType
+from .const import (
+    DOMAIN,
+    MARKER_LATITUDE,
+    MARKER_LONGITUDE,
+    SHOW_MARKER,
+    LAST_UPDATED,
+    ImageType,
+)
 from .tools import calculate_mercator_position
 
 TIMEOUT = 10
@@ -106,6 +114,11 @@ class WeerplazaApi:
                             self.__add_filename_to_images(image_type, time_val)
 
             await self.async_create_animated_gif(image_type)
+
+        self.set_setting(
+            LAST_UPDATED,
+            datetime.now().replace(tzinfo=ZoneInfo(self._hass.config.time_zone)),
+        )
 
     async def __async_get_image_data(
         self, image_type: ImageType

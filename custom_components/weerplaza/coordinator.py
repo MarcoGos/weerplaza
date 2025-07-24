@@ -1,12 +1,9 @@
 """Weerplaza Data Update Coordinator"""
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 import logging
-from typing import Any
-from zoneinfo import ZoneInfo
 
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
-from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.core import HomeAssistant
 
 from .api import WeerplazaApi
@@ -38,11 +35,6 @@ class WeerplazaDataUpdateCoordinator(DataUpdateCoordinator):
             update_interval=timedelta(seconds=DEFAULT_SYNC_INTERVAL),
         )
 
-    async def _async_update_data(self) -> dict[str, Any]:
+    async def _async_update_data(self) -> None:
         """Update data via api."""
         await self.api.async_get_new_images()
-        return {
-            "last_updated": datetime.now().replace(
-                tzinfo=ZoneInfo(self._hass.config.time_zone)
-            )
-        }

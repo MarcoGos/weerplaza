@@ -9,14 +9,14 @@ from homeassistant.components.sensor.const import (
 )
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
-from .const import DOMAIN, DEFAULT_NAME
+from .const import DOMAIN, DEFAULT_NAME, LAST_UPDATED
 from .coordinator import WeerplazaDataUpdateCoordinator
 from .entity import WeerplazaEntity
 
 DESCRIPTIONS: list[SensorEntityDescription] = [
     SensorEntityDescription(
-        key="last_updated",
-        translation_key="last_updated",
+        key=LAST_UPDATED,
+        translation_key=LAST_UPDATED,
         icon="mdi:clock-outline",
         device_class=SensorDeviceClass.TIMESTAMP,
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -66,4 +66,4 @@ class WeerplazaSensor(WeerplazaEntity, SensorEntity):
     @property
     def native_value(self) -> StateType:  # type: ignore
         """Return the state of the sensor."""
-        return self.coordinator.data.get(self.entity_description.key, None)
+        return self.coordinator.api.setting(LAST_UPDATED)

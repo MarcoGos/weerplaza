@@ -56,9 +56,6 @@ class WeerplazaSwitch(WeerplazaEntity, SwitchEntity):
     # class WeerplazaSwitch(SwitchEntity):
     """Representation of a Weerplaza switch entity."""
 
-    # _attr_has_entity_name = True
-    _attr_device_class = SwitchDeviceClass.SWITCH
-
     def __init__(
         self,
         coordinator: WeerplazaDataUpdateCoordinator,
