@@ -1,10 +1,10 @@
-"""Constants for the Weer Plaza integration."""
+"""Constants for the Weerplaza integration."""
 
 from enum import Enum
 
-NAME = "Weer Plaza"
-DOMAIN = "weerplaza"
-MANUFACTURER = "weerplaza"
+NAME = "Weerplaza"
+DOMAIN = NAME.lower()
+MANUFACTURER = NAME
 
 DEFAULT_SYNC_INTERVAL = 300  # seconds
 

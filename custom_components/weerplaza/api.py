@@ -31,14 +31,13 @@ IMAGE_URLS = {
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 
 
-class WeerPlazaApi:
-    """WeerPlaza API client to fetch weather images."""
+class WeerplazaApi:
+    """Weerplaza API client to fetch weather images."""
 
     _headers: dict[str, str] = {"User-Agent": "Home Assistant (Weer Plaza)"}
     _images: dict[ImageType, Any] = {}
     _storage_paths: dict[ImageType, str] = {}
     _timezone: Any = None
-    _show_marker: bool = False
 
     def __init__(self, hass: HomeAssistant) -> None:
         self._hass = hass
@@ -53,10 +52,10 @@ class WeerPlazaApi:
         )
         self._session = async_get_clientsession(self._hass)
         self.__create_storage_paths()
-        self._show_marker = hass.data[DOMAIN].get("show_marker", False)
+        self._show_marker = hass.data[DOMAIN].get("show_marker", True)
 
     async def async_get_new_images(self) -> None:
-        """Fetch new images from the WeerPlaza API."""
+        """Fetch new images from the Weerplaza API."""
         for image_type, file_path in IMAGE_URLS.items():
             if not file_path:
                 continue
@@ -306,7 +305,7 @@ class WeerPlazaApi:
 
     async def async_request_refresh(self) -> None:
         """Request a refresh of the images."""
-        _LOGGER.debug("Refreshing WeerPlaza images")
+        _LOGGER.debug("Refreshing Weerplaza images")
         for image_type in IMAGE_URLS:
             await self.async_create_animated_gif(image_type)
 

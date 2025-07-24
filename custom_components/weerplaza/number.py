@@ -1,4 +1,4 @@
-"""WeerPlaza Number Entities"""
+"""Weerplaza Number Entities"""
 
 from homeassistant.components.number import NumberEntity, NumberEntityDescription
 from homeassistant.config_entries import ConfigEntry
@@ -7,9 +7,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.components.number.const import DOMAIN as NUMBER_DOMAIN, NumberMode
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from .coordinator import WeerPlazaDataUpdateCoordinator
+from .coordinator import WeerplazaDataUpdateCoordinator
 from .const import DOMAIN, DEFAULT_NAME, MARKER_LATITUDE, MARKER_LONGITUDE
-from .entity import WeerPlazaEntity
+from .entity import WeerplazaEntity
 
 DESCRIPTIONS: list[NumberEntityDescription] = [
     NumberEntityDescription(
@@ -38,15 +38,15 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    """Set up Weer Plaza numbers based on a config entry."""
+    """Set up Weerplaza numbers based on a config entry."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
 
-    entities: list[WeerPlazaNumber] = []
+    entities: list[WeerplazaNumber] = []
 
     # Add all numbers described above.
     for description in DESCRIPTIONS:
         entities.append(
-            WeerPlazaNumber(
+            WeerplazaNumber(
                 coordinator=coordinator,
                 entry_id=entry.entry_id,
                 description=description,
@@ -56,12 +56,12 @@ async def async_setup_entry(
     async_add_entities(entities)
 
 
-class WeerPlazaNumber(WeerPlazaEntity, NumberEntity):
-    """Representation of a Weer Plaza number entity."""
+class WeerplazaNumber(WeerplazaEntity, NumberEntity):
+    """Representation of a Weerplaza number entity."""
 
     def __init__(
         self,
-        coordinator: WeerPlazaDataUpdateCoordinator,
+        coordinator: WeerplazaDataUpdateCoordinator,
         entry_id: str,
         description: NumberEntityDescription,
     ) -> None:

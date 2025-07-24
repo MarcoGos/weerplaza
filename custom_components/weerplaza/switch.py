@@ -1,4 +1,4 @@
-"""WeerPlaza Switch Entities"""
+"""Weerplaza Switch Entities"""
 
 from typing import Any
 import logging
@@ -14,9 +14,9 @@ from homeassistant.components.switch.const import DOMAIN as SWITCH_DOMAIN
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from .coordinator import WeerPlazaDataUpdateCoordinator
+from .coordinator import WeerplazaDataUpdateCoordinator
 from .const import DOMAIN, DEFAULT_NAME, SHOW_MARKER, MANUFACTURER, NAME
-from .entity import WeerPlazaEntity
+from .entity import WeerplazaEntity
 
 DESCRIPTIONS: list[SwitchEntityDescription] = [
     SwitchEntityDescription(
@@ -35,15 +35,15 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    """Set up Weer Plaza switches based on a config entry."""
+    """Set up Weerplaza switches based on a config entry."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
 
-    entities: list[WeerPlazaSwitch] = []
+    entities: list[WeerplazaSwitch] = []
 
     # Add all numbers described above.
     for description in DESCRIPTIONS:
         entities.append(
-            WeerPlazaSwitch(
+            WeerplazaSwitch(
                 coordinator=coordinator,
                 entry_id=entry.entry_id,
                 description=description,
@@ -53,16 +53,16 @@ async def async_setup_entry(
     async_add_entities(entities)
 
 
-class WeerPlazaSwitch(WeerPlazaEntity, SwitchEntity):
-    # class WeerPlazaSwitch(SwitchEntity):
-    """Representation of a Weer Plaza switch entity."""
+class WeerplazaSwitch(WeerplazaEntity, SwitchEntity):
+    # class WeerplazaSwitch(SwitchEntity):
+    """Representation of a Weerplaza switch entity."""
 
     # _attr_has_entity_name = True
     _attr_device_class = SwitchDeviceClass.SWITCH
 
     def __init__(
         self,
-        coordinator: WeerPlazaDataUpdateCoordinator,
+        coordinator: WeerplazaDataUpdateCoordinator,
         entry_id: str,
         description: SwitchEntityDescription,
     ) -> None:

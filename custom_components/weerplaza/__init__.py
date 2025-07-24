@@ -1,18 +1,16 @@
-"""The Weer Plaza integration."""
+"""The Weerplaza integration."""
 
 from __future__ import annotations
-from typing import Any
 import logging
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.const import Platform
 
-from .api import WeerPlazaApi
-from .const import DOMAIN, NAME, MANUFACTURER
-from .coordinator import WeerPlazaDataUpdateCoordinator
-from .services import WeerPlazaServicesSetup
+from .api import WeerplazaApi
+from .const import DOMAIN
+from .coordinator import WeerplazaDataUpdateCoordinator
+from .services import WeerplazaServicesSetup
 
 PLATFORMS: list[Platform] = [
     Platform.CAMERA,
@@ -25,15 +23,15 @@ _LOGGER: logging.Logger = logging.getLogger(__package__)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up Weer Plaza from a config entry."""
+    """Set up Weerplaza from a config entry."""
     if hass.data.get(DOMAIN) is None:
         hass.data.setdefault(DOMAIN, {})
 
     _LOGGER.debug("entry.data: %s", entry.data)
 
-    api = WeerPlazaApi(hass)
+    api = WeerplazaApi(hass)
 
-    hass.data[DOMAIN][entry.entry_id] = coordinator = WeerPlazaDataUpdateCoordinator(
+    hass.data[DOMAIN][entry.entry_id] = coordinator = WeerplazaDataUpdateCoordinator(
         hass=hass,
         api=api,
     )
@@ -43,7 +41,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))
 
-    WeerPlazaServicesSetup(hass, entry)
+    WeerplazaServicesSetup(hass, entry)
 
     return True
 

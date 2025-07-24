@@ -3,18 +3,18 @@
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
 
-from .coordinator import WeerPlazaDataUpdateCoordinator
+from .coordinator import WeerplazaDataUpdateCoordinator
 from .const import DOMAIN
 
 
-class WeerPlazaServicesSetup:
+class WeerplazaServicesSetup:
     """Class to handle Integration Services."""
 
     def __init__(self, hass: HomeAssistant, config_entry: ConfigEntry) -> None:
         """Initialise services."""
         self.hass = hass
         self.config_entry = config_entry
-        self.coordinator: WeerPlazaDataUpdateCoordinator = hass.data[DOMAIN][
+        self.coordinator: WeerplazaDataUpdateCoordinator = hass.data[DOMAIN][
             config_entry.entry_id
         ]
 

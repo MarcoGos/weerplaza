@@ -5,7 +5,7 @@
         },
         "step": {
             "user": {
-                "description": "This will install the WeerPlaza integration."
+                "description": "This will install the Weerplaza integration."
             }
         }
     },

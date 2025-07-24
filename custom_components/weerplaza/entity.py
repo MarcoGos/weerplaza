@@ -1,4 +1,4 @@
-"""WeerPlaza Entity Base Class"""
+"""Weerplaza Entity Base Class"""
 
 from homeassistant.core import callback
 from homeassistant.helpers.device_registry import DeviceInfo
@@ -6,18 +6,18 @@ from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DEFAULT_NAME, DOMAIN, MANUFACTURER, NAME
-from .coordinator import WeerPlazaDataUpdateCoordinator
+from .coordinator import WeerplazaDataUpdateCoordinator
 
 
-class WeerPlazaEntity(CoordinatorEntity[WeerPlazaDataUpdateCoordinator]):
-    """Base class for Weer Plaza entities."""
+class WeerplazaEntity(CoordinatorEntity[WeerplazaDataUpdateCoordinator]):
+    """Base class for Weerplaza entities."""
 
     _attr_has_entity_name = True
     _attr_should_poll = False
 
     def __init__(
         self,
-        coordinator: WeerPlazaDataUpdateCoordinator,
+        coordinator: WeerplazaDataUpdateCoordinator,
         description: EntityDescription,
         entry_id: str,
     ) -> None:

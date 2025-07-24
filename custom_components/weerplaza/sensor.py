@@ -1,4 +1,4 @@
-"""WeerPlaza Sensor Entities"""
+"""Weerplaza Sensor Entities"""
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
@@ -10,8 +10,8 @@ from homeassistant.components.sensor.const import (
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from .const import DOMAIN, DEFAULT_NAME
-from .coordinator import WeerPlazaDataUpdateCoordinator
-from .entity import WeerPlazaEntity
+from .coordinator import WeerplazaDataUpdateCoordinator
+from .entity import WeerplazaEntity
 
 DESCRIPTIONS: list[SensorEntityDescription] = [
     SensorEntityDescription(
@@ -29,14 +29,14 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up Weer Plaza sensors based on a config entry."""
+    """Set up Weerplaza sensors based on a config entry."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]
-    entities: list[WeerPlazaSensor] = []
+    entities: list[WeerplazaSensor] = []
 
     # Add all sensors described above.
     for description in DESCRIPTIONS:
         entities.append(
-            WeerPlazaSensor(
+            WeerplazaSensor(
                 coordinator=coordinator,
                 entry_id=config_entry.entry_id,
                 description=description,
@@ -46,16 +46,16 @@ async def async_setup_entry(
     async_add_entities(entities)
 
 
-class WeerPlazaSensor(WeerPlazaEntity, SensorEntity):
-    """Defines a Weer Plaza sensor."""
+class WeerplazaSensor(WeerplazaEntity, SensorEntity):
+    """Defines a Weerplaza sensor."""
 
     def __init__(
         self,
-        coordinator: WeerPlazaDataUpdateCoordinator,
+        coordinator: WeerplazaDataUpdateCoordinator,
         entry_id: str,
         description: SensorEntityDescription,
     ) -> None:
-        """Initialize Weer Plaza sensor."""
+        """Initialize Weerplaza sensor."""
         super().__init__(
             coordinator=coordinator,
             description=description,

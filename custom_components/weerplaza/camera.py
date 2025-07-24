@@ -14,13 +14,13 @@ from .const import (
     THUNDER,
     ImageType,
 )
-from .coordinator import WeerPlazaDataUpdateCoordinator
-from .entity import WeerPlazaEntity
+from .coordinator import WeerplazaDataUpdateCoordinator
+from .entity import WeerplazaEntity
 
 
 @dataclass(frozen=True, kw_only=True)
-class WeerPlazaCameraEntityDescription(CameraEntityDescription):
-    """Describes Weer Plaza camera entity."""
+class WeerplazaCameraEntityDescription(CameraEntityDescription):
+    """Describes Weerplaza camera entity."""
 
     key: str | None = None
     translation_key: str | None = None
@@ -28,20 +28,20 @@ class WeerPlazaCameraEntityDescription(CameraEntityDescription):
     image_type: ImageType
 
 
-DESCRIPTIONS: list[WeerPlazaCameraEntityDescription] = [
-    WeerPlazaCameraEntityDescription(
+DESCRIPTIONS: list[WeerplazaCameraEntityDescription] = [
+    WeerplazaCameraEntityDescription(
         key=PRECIPITATION_RADAR,
         translation_key=PRECIPITATION_RADAR,
         icon="mdi:radar",
         image_type=ImageType.RADAR,
     ),
-    WeerPlazaCameraEntityDescription(
+    WeerplazaCameraEntityDescription(
         key=SATELLITE,
         translation_key=SATELLITE,
         icon="mdi:satellite",
         image_type=ImageType.SATELLITE,
     ),
-    WeerPlazaCameraEntityDescription(
+    WeerplazaCameraEntityDescription(
         key=THUNDER,
         translation_key=THUNDER,
         icon="mdi:lightning-bolt-outline",
@@ -55,15 +55,15 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up Weer Plaza cameras based on a config entry."""
+    """Set up Weerplaza cameras based on a config entry."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
 
-    entities: list[WeerPlazaCamera] = []
+    entities: list[WeerplazaCamera] = []
 
     # Add all images described above.
     for description in DESCRIPTIONS:
         entities.append(
-            WeerPlazaCamera(
+            WeerplazaCamera(
                 coordinator=coordinator,
                 entry_id=entry.entry_id,
                 description=description,
@@ -73,16 +73,16 @@ async def async_setup_entry(
     async_add_entities(entities)
 
 
-class WeerPlazaCamera(WeerPlazaEntity, Camera):
+class WeerplazaCamera(WeerplazaEntity, Camera):
     """Defines the radar weer plaza camera."""
 
     def __init__(
         self,
-        coordinator: WeerPlazaDataUpdateCoordinator,
+        coordinator: WeerplazaDataUpdateCoordinator,
         entry_id: str,
-        description: WeerPlazaCameraEntityDescription,
+        description: WeerplazaCameraEntityDescription,
     ) -> None:
-        """Initialize Weer Plaza camera."""
+        """Initialize Weerplaza camera."""
         Camera.__init__(self)
         super().__init__(
             coordinator=coordinator, description=description, entry_id=entry_id

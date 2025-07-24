@@ -1,4 +1,4 @@
-"""WeerPlaza Data Update Coordinator"""
+"""Weerplaza Data Update Coordinator"""
 
 from datetime import datetime, timedelta
 import logging
@@ -9,7 +9,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.core import HomeAssistant
 
-from .api import WeerPlazaApi
+from .api import WeerplazaApi
 from .const import (
     DEFAULT_SYNC_INTERVAL,
     DOMAIN,
@@ -18,16 +18,16 @@ from .const import (
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 
 
-class WeerPlazaDataUpdateCoordinator(DataUpdateCoordinator):
+class WeerplazaDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the API."""
 
     def __init__(
         self,
         hass: HomeAssistant,
-        api: WeerPlazaApi,
+        api: WeerplazaApi,
     ) -> None:
         """Initialize."""
-        self.api: WeerPlazaApi = api
+        self.api: WeerplazaApi = api
         self.platforms: list[str] = []
         self._hass = hass
 
