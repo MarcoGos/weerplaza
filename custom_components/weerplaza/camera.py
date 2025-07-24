@@ -85,7 +85,7 @@ class WeerPlazaCamera(WeerPlazaEntity, Camera):
         """Initialize Weer Plaza camera."""
         Camera.__init__(self)
         super().__init__(
-            coordinator=coordinator, entity_description=description, entry_id=entry_id
+            coordinator=coordinator, description=description, entry_id=entry_id
         )
 
         self._attr_content_type = "image/gif"

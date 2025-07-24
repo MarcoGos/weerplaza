@@ -14,7 +14,12 @@ from .const import DOMAIN, NAME, MANUFACTURER
 from .coordinator import WeerPlazaDataUpdateCoordinator
 from .services import WeerPlazaServicesSetup
 
-PLATFORMS: list[Platform] = [Platform.CAMERA, Platform.NUMBER, Platform.SENSOR]
+PLATFORMS: list[Platform] = [
+    Platform.CAMERA,
+    Platform.NUMBER,
+    Platform.SENSOR,
+    Platform.SWITCH,
+]
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 
@@ -26,7 +31,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     _LOGGER.debug("entry.data: %s", entry.data)
 
-    api = WeerPlazaApi(hass, hass.config.latitude, hass.config.longitude)
+    api = WeerPlazaApi(hass)
 
     hass.data[DOMAIN][entry.entry_id] = coordinator = WeerPlazaDataUpdateCoordinator(
         hass=hass,

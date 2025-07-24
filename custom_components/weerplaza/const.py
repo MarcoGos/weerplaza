@@ -12,6 +12,7 @@ DEFAULT_NAME = NAME.lower()
 
 MARKER_LATITUDE = "marker_latitude"
 MARKER_LONGITUDE = "marker_longitude"
+SHOW_MARKER = "show_marker"
 PRECIPITATION_RADAR = "precipitation_radar"
 SATELLITE = "satellite"
 THUNDER = "thunder"

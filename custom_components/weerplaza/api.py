@@ -16,7 +16,7 @@ from homeassistant.helpers.storage import STORAGE_DIR
 from PIL import Image, ImageFile, ImageDraw, ImageFont
 import imageio.v2 as imageio
 
-from .const import DOMAIN, ImageType
+from .const import DOMAIN, MARKER_LATITUDE, MARKER_LONGITUDE, SHOW_MARKER, ImageType
 from .tools import calculate_mercator_position
 
 TIMEOUT = 10
@@ -38,14 +38,22 @@ class WeerPlazaApi:
     _images: dict[ImageType, Any] = {}
     _storage_paths: dict[ImageType, str] = {}
     _timezone: Any = None
+    _show_marker: bool = False
 
-    def __init__(self, hass: HomeAssistant, latitude: float, longitude: float) -> None:
+    def __init__(self, hass: HomeAssistant) -> None:
         self._hass = hass
         self._timezone = self._hass.config.time_zone
-        self._latitude = latitude
-        self._longitude = longitude
+        self._latitude = (
+            self._hass.data[DOMAIN].get(MARKER_LATITUDE, None)
+            or self._hass.config.latitude
+        )
+        self._longitude = (
+            self._hass.data[DOMAIN].get(MARKER_LONGITUDE, None)
+            or self._hass.config.longitude
+        )
         self._session = async_get_clientsession(self._hass)
         self.__create_storage_paths()
+        self._show_marker = hass.data[DOMAIN].get("show_marker", False)
 
     async def async_get_new_images(self) -> None:
         """Fetch new images from the WeerPlaza API."""
@@ -210,7 +218,7 @@ class WeerPlazaApi:
             if not os.path.exists(image_data):
                 continue
             # Add marker location if set
-            if self._latitude and self._longitude:
+            if self._show_marker and self._latitude and self._longitude:
                 final = Image.open(image_data).convert("RGBA")
                 marker = self.__get_marker_image()
                 marker_x, marker_y = calculate_mercator_position(
@@ -280,22 +288,33 @@ class WeerPlazaApi:
             if not os.path.exists(self.get_storage_path(image_type)):
                 os.makedirs(self.get_storage_path(image_type), exist_ok=True)
 
+    def async_get_marker_location(self) -> tuple[float | None, float | None]:
+        """Get the marker location."""
+        return (self._latitude, self._longitude)
+
     async def async_set_marker_location(
         self, latitude: float | None, longitude: float | None
     ) -> None:
         """Set the marker location."""
         if latitude:
             self._latitude = latitude
+            self._hass.data[DOMAIN][MARKER_LATITUDE] = latitude
         if longitude:
             self._longitude = longitude
+            self._hass.data[DOMAIN][MARKER_LONGITUDE] = longitude
         _LOGGER.debug("Setting marker location to (%s, %s)", latitude, longitude)
-
-    def async_get_marker_location(self) -> tuple[float | None, float | None]:
-        """Get the marker location."""
-        return (self._latitude, self._longitude)
 
     async def async_request_refresh(self) -> None:
         """Request a refresh of the images."""
         _LOGGER.debug("Refreshing WeerPlaza images")
         for image_type in IMAGE_URLS:
             await self.async_create_animated_gif(image_type)
+
+    def get_show_marker(self) -> bool:
+        """Get the show marker flag."""
+        return self._show_marker
+
+    def set_show_marker(self, value: bool) -> None:
+        """Set the show marker flag."""
+        self._show_marker = value
+        self._hass.data[DOMAIN][SHOW_MARKER] = value

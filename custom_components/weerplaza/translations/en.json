@@ -33,7 +33,12 @@
             "last_updated": {
                 "name": "Last Updated"
             }
-        }
+        },
+        "switch": {
+            "show_marker": {
+                "name": "Show Marker"
+            }
+        }   
     },
     "services": {
         "force_update": {

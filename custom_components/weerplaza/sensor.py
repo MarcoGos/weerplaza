@@ -58,7 +58,7 @@ class WeerPlazaSensor(WeerPlazaEntity, SensorEntity):
         """Initialize Weer Plaza sensor."""
         super().__init__(
             coordinator=coordinator,
-            entity_description=description,
+            description=description,
             entry_id=entry_id,
         )
         self.entity_id = f"{SENSOR_DOMAIN}.{DEFAULT_NAME} {description.key}"

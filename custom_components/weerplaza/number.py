@@ -67,7 +67,7 @@ class WeerPlazaNumber(WeerPlazaEntity, NumberEntity):
     ) -> None:
         """Initialize the number entity."""
         super().__init__(
-            coordinator=coordinator, entity_description=description, entry_id=entry_id
+            coordinator=coordinator, description=description, entry_id=entry_id
         )
         self.entity_id = f"{NUMBER_DOMAIN}.{DEFAULT_NAME}_{description.key}"
 
@@ -80,6 +80,7 @@ class WeerPlazaNumber(WeerPlazaEntity, NumberEntity):
             return latitude
         elif key == MARKER_LONGITUDE:
             return longitude
+        return None
 
     async def async_set_native_value(self, value: float) -> None:
         """Set the number value."""
@@ -90,3 +91,4 @@ class WeerPlazaNumber(WeerPlazaEntity, NumberEntity):
         elif key == MARKER_LONGITUDE:
             longitude = value
         await self.coordinator.api.async_set_marker_location(latitude, longitude)
+        self.async_write_ha_state()

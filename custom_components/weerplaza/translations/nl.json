@@ -33,6 +33,11 @@
             "last_updated": {
                 "name": "Laatst bijgewerkt"
             }
+        },
+        "switch": {
+            "show_marker": {
+                "name": "Toon markering"
+            }
         }
     },
     "services": {

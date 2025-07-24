@@ -1,6 +1,16 @@
 {
+  "entity": {
+    "switch": {
+      "show_marker": {
+        "default": "mdi:map-marker-off-outline",
+        "state": {
+          "on": "mdi:map-marker-outline",
+          "off": "mdi:map-marker-off-outline"
+        }
+      }
+    }
+  },
   "services": {
-    "set_marker_location": "mdi:map-marker-radius-outline",
     "force_update": "mdi:update"
   }
 }
