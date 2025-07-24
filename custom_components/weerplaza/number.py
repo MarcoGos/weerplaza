@@ -74,21 +74,9 @@ class WeerplazaNumber(WeerplazaEntity, NumberEntity):
     @property
     def native_value(self) -> float | None:
         """Return the current value of the number."""
-        latitude, longitude = self.coordinator.api.async_get_marker_location()
-        key = self.entity_description.key
-        if key == MARKER_LATITUDE:
-            return latitude
-        elif key == MARKER_LONGITUDE:
-            return longitude
-        return None
+        return self.coordinator.api.setting(self.entity_description.key)
 
     async def async_set_native_value(self, value: float) -> None:
         """Set the number value."""
-        latitude, longitude = self.coordinator.api.async_get_marker_location()
-        key = self.entity_description.key
-        if key == MARKER_LATITUDE:
-            latitude = value
-        elif key == MARKER_LONGITUDE:
-            longitude = value
-        await self.coordinator.api.async_set_marker_location(latitude, longitude)
+        self.coordinator.api.set_setting(self.entity_description.key, value, store=True)
         self.async_write_ha_state()

@@ -11,18 +11,17 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.components.switch.const import DOMAIN as SWITCH_DOMAIN
-from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .coordinator import WeerplazaDataUpdateCoordinator
-from .const import DOMAIN, DEFAULT_NAME, SHOW_MARKER, MANUFACTURER, NAME
+from .const import DOMAIN, DEFAULT_NAME, SHOW_MARKER
 from .entity import WeerplazaEntity
 
 DESCRIPTIONS: list[SwitchEntityDescription] = [
     SwitchEntityDescription(
         key=SHOW_MARKER,
         translation_key=SHOW_MARKER,
-        # device_class=SwitchDeviceClass.SWITCH,
+        device_class=SwitchDeviceClass.SWITCH,
         entity_category=EntityCategory.CONFIG,
     ),
 ]
@@ -78,23 +77,16 @@ class WeerplazaSwitch(WeerplazaEntity, SwitchEntity):
     @property
     def is_on(self) -> bool | None:
         """Return if the switch is on."""
-        key = self.entity_description.key
-        if key == SHOW_MARKER:
-            return self.coordinator.api.get_show_marker()
-        return None
+        return self.coordinator.api.setting(self.entity_description.key)
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the switch on."""
-        key = self.entity_description.key
-        if key == SHOW_MARKER:
-            self.coordinator.api.set_show_marker(True)
-            await self.coordinator.api.async_request_refresh()
-            self.async_write_ha_state()
+        self.coordinator.api.set_setting(self.entity_description.key, True, store=True)
+        await self.coordinator.api.async_request_refresh()
+        self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the switch off."""
-        key = self.entity_description.key
-        if key == SHOW_MARKER:
-            self.coordinator.api.set_show_marker(False)
-            await self.coordinator.api.async_request_refresh()
-            self.async_write_ha_state()
+        self.coordinator.api.set_setting(self.entity_description.key, False, store=True)
+        await self.coordinator.api.async_request_refresh()
+        self.async_write_ha_state()
