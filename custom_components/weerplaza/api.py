@@ -1,3 +1,5 @@
+"""Weerplaza API client for Home Assistant."""
+
 from typing import Any
 
 import os
@@ -35,7 +37,7 @@ IMAGE_URLS = {
     ImageType.SATELLITE: "https://api.meteoplaza.com/v2/splash/10728/sat?access_token=weerplaza&usehd=1",
     ImageType.THUNDER: "https://api.meteoplaza.com/v2/splash/10728/thunder?access_token=weerplaza&usehd=1",
     ImageType.HAIL: "https://api.meteoplaza.com/v2/splash/10728/hail?access_token=weerplaza&usehd=1",
-    ImageType.DRIZZLE: "https://api.meteoplaza.com/v2/splash/10728/preciptype?access_token=weerplaza&usehd=1",
+    ImageType.DRIZZLE_SNOW: "https://api.meteoplaza.com/v2/splash/10728/preciptype?access_token=weerplaza&usehd=1",
 }
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)

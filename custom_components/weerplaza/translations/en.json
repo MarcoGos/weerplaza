@@ -23,8 +23,8 @@
             "hail": {
                 "name": "Hail"
             },
-            "drizzle": {
-                "name": "Drizzle"
+            "drizzle_snow": {
+                "name": "Drizzle/Snow"
             }
         },
         "number": {

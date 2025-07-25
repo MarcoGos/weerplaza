@@ -23,8 +23,8 @@
             "hail": {
                 "name": "Hagel"
             },
-            "drizzle": {
-                "name": "Motregen"
+            "drizzle_snow": {
+                "name": "Motregen/Sneeuw"
             }
         },
         "number": {
