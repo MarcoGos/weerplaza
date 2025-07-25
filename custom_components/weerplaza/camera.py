@@ -46,7 +46,6 @@ DESCRIPTIONS: list[WeerplazaCameraEntityDescription] = [
         icon="mdi:satellite",
         image_type=ImageType.SATELLITE,
         entity_registry_enabled_default=False,
-        entity_registry_visible_default=False,
     ),
     WeerplazaCameraEntityDescription(
         key=THUNDER,
@@ -54,7 +53,6 @@ DESCRIPTIONS: list[WeerplazaCameraEntityDescription] = [
         icon="mdi:lightning-bolt-outline",
         image_type=ImageType.THUNDER,
         entity_registry_enabled_default=False,
-        entity_registry_visible_default=False,
     ),
     WeerplazaCameraEntityDescription(
         key=HAIL,
@@ -62,7 +60,6 @@ DESCRIPTIONS: list[WeerplazaCameraEntityDescription] = [
         icon="mdi:weather-hail",
         image_type=ImageType.HAIL,
         entity_registry_enabled_default=False,
-        entity_registry_visible_default=False,
     ),
     WeerplazaCameraEntityDescription(
         key=DRIZZLE_SNOW,
@@ -70,7 +67,6 @@ DESCRIPTIONS: list[WeerplazaCameraEntityDescription] = [
         icon="mdi:weather-rainy",
         image_type=ImageType.DRIZZLE_SNOW,
         entity_registry_enabled_default=False,
-        entity_registry_visible_default=False,
     ),
 ]
 
