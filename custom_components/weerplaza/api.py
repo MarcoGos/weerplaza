@@ -31,9 +31,11 @@ TIMEOUT = 10
 IMAGES_TO_KEEP = 18
 
 IMAGE_URLS = {
-    ImageType.RADAR: "https://api.meteoplaza.com/v2/splash/10728/obs?access_token=weerplaza&usehd=1",
+    ImageType.RAIN_RADAR: "https://api.meteoplaza.com/v2/splash/10728/obs?access_token=weerplaza&usehd=1",
     ImageType.SATELLITE: "https://api.meteoplaza.com/v2/splash/10728/sat?access_token=weerplaza&usehd=1",
     ImageType.THUNDER: "https://api.meteoplaza.com/v2/splash/10728/thunder?access_token=weerplaza&usehd=1",
+    ImageType.HAIL: "https://api.meteoplaza.com/v2/splash/10728/hail?access_token=weerplaza&usehd=1",
+    ImageType.DRIZZLE: "https://api.meteoplaza.com/v2/splash/10728/preciptype?access_token=weerplaza&usehd=1",
 }
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
@@ -47,6 +49,7 @@ class WeerplazaApi:
     _storage_paths: dict[ImageType, str] = {}
     _timezone: Any = None
     _settings: dict[str, Any] = {}
+    _cameras: dict[ImageType, bool] = {}
 
     def __init__(self, hass: HomeAssistant) -> None:
         self._hass = hass
@@ -68,6 +71,9 @@ class WeerplazaApi:
             ),
         )
         self.set_setting(SHOW_MARKER, hass.data[DOMAIN].get(SHOW_MARKER, True))
+        for image_type in IMAGE_URLS:
+            self._images[image_type] = []
+            self._cameras[image_type] = False
 
     def set_setting(self, key: str, value: Any, store: bool = False) -> None:
         """Set a setting for the API."""
@@ -83,6 +89,8 @@ class WeerplazaApi:
     async def async_get_new_images(self) -> None:
         """Fetch new images from the Weerplaza API."""
         for image_type, file_path in IMAGE_URLS.items():
+            if not self.__is_camera_registered(image_type):
+                continue
             if not file_path:
                 continue
             if not self._images.get(image_type, None):
@@ -242,6 +250,8 @@ class WeerplazaApi:
         await self._hass.async_add_executor_job(self.__create_animated_gif, image_type)
 
     def __create_animated_gif(self, image_type: ImageType):
+        if not self.__is_camera_registered(image_type):
+            return
         images = []
         duration = []
         for index, image_data in enumerate(self._images[image_type]):
@@ -280,12 +290,13 @@ class WeerplazaApi:
             duration.append(
                 2000 if index == len(self._images[image_type]) - 1 else 200
             )  # 200 ms for all but the last frame
-        imageio.mimwrite(
-            f"{self.get_storage_path(image_type)}/animated.gif",
-            images,
-            loop=0,
-            duration=duration,
-        )
+        if len(images) > 0:
+            imageio.mimwrite(
+                f"{self.get_storage_path(image_type)}/animated.gif",
+                images,
+                loop=0,
+                duration=duration,
+            )
 
     def __build_images_list(self, image_type: ImageType) -> None:
         """Build the list of images from the storage path."""
@@ -322,33 +333,22 @@ class WeerplazaApi:
             if not os.path.exists(self.get_storage_path(image_type)):
                 os.makedirs(self.get_storage_path(image_type), exist_ok=True)
 
-    # def async_get_marker_location(self) -> tuple[float | None, float | None]:
-    #     """Get the marker location."""
-    #     return (self.param("latitude"), self.param("longitude"))
-
-    # async def async_set_marker_location(
-    #     self, latitude: float | None, longitude: float | None
-    # ) -> None:
-    #     """Set the marker location."""
-    #     if latitude:
-    #         self.set_param("latitude", latitude)
-    #         self._hass.data[DOMAIN][MARKER_LATITUDE] = latitude
-    #     if longitude:
-    #         self.set_param("longitude", longitude)
-    #         self._hass.data[DOMAIN][MARKER_LONGITUDE] = longitude
-    #     _LOGGER.debug("Setting marker location to (%s, %s)", latitude, longitude)
-
-    async def async_request_refresh(self) -> None:
-        """Request a refresh of the images."""
+    async def async_force_refresh(self) -> None:
+        """Force refresh of the images."""
         _LOGGER.debug("Refreshing Weerplaza images")
         for image_type in IMAGE_URLS:
+            if not self.__is_camera_registered(image_type):
+                continue
             await self.async_create_animated_gif(image_type)
 
-    # def get_show_marker(self) -> bool:
-    #     """Get the show marker flag."""
-    #     return self.param("show_marker")
+    def __is_camera_registered(self, image_type: ImageType) -> bool:
+        """Check if the image type is enabled."""
+        return self._cameras.get(image_type, False)
 
-    # def set_show_marker(self, value: bool) -> None:
-    #     """Set the show marker flag."""
-    #     self.set_param("show_marker", value)
-    #     self._hass.data[DOMAIN][SHOW_MARKER] = value
+    def register_camera(self, image_type: ImageType) -> None:
+        """Register a camera for the given image type."""
+        self._cameras[image_type] = True
+
+    def unregister_camera(self, image_type: ImageType) -> None:
+        """Unregister a camera for the given image type."""
+        self._cameras[image_type] = False

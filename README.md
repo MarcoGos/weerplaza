@@ -21,9 +21,11 @@ Nothing to setup.
 
 The following images (cameras) will be registered:
 
-- Precipitation Radar
+- Rain Radar
 - Satellite
 - Thunder
+- Hail
+- Drizzle
 
 A latitude and longitude value can be set to show the marker on de images.
 

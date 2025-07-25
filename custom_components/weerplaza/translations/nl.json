@@ -11,14 +11,20 @@
     },
     "entity": {
         "camera": {
-            "precipitation_radar": {
-                "name": "Neerslagradar"
+            "rain_radar": {
+                "name": "Regenradar"
             },
             "satellite": {
                 "name": "Satellietbeelden"
             },
             "thunder": {
                 "name": "Onweer"
+            },
+            "hail": {
+                "name": "Hagel"
+            },
+            "drizzle": {
+                "name": "Motregen"
             }
         },
         "number": {

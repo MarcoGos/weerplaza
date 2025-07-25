@@ -29,7 +29,7 @@ class WeerplazaServicesSetup:
             self.force_update,
         )
 
-    async def force_update(self, call: ServiceCall) -> None:
+    async def force_update(self, _: ServiceCall) -> None:
         """Force update service"""
         api = self.coordinator.api
-        await api.async_request_refresh()
+        await api.async_force_refresh()

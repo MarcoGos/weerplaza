@@ -11,14 +11,20 @@
     },
     "entity": {
         "camera": {
-            "precipitation_radar": {
-                "name": "Precipitation Radar"
+            "rain_radar": {
+                "name": "Rain Radar"
             },
             "satellite": {
                 "name": "Satellite"
             },
             "thunder": {
                 "name": "Thunder"
+            },
+            "hail": {
+                "name": "Hail"
+            },
+            "drizzle": {
+                "name": "Drizzle"
             }
         },
         "number": {
