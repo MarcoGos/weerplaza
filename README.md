@@ -27,8 +27,22 @@ The following images (cameras) will be registered:
 - Hail
 - Drizzle
 
-A latitude and longitude value can be set to show the marker on de images.
+The following sensors will be registered
 
-A switch is available to show/hide the marker
+- Latitude Marker
+- Longitude Marker
 
-A service is available called "Force Update" to update the marker on the images after the latitude and/or longitude values changed.
+The following switch will be registered
+
+- Show/Hide Marker
+    - This will automatically update all enabled images (cameras)
+
+The following action will be registed
+
+- "Force Update"
+    - Update the marker on the images after the latitude and/or longitude values changed.
+
+## Examples
+
+![RainRadar](/assets/camera_weerplaza_rain_radar_example.jpg)
+![Satellite](/assets/camera_weerplaza_satellite_example.jpg)
