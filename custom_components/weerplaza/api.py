@@ -7,6 +7,7 @@ import glob
 import logging
 from zoneinfo import ZoneInfo
 from io import BytesIO
+from shutil import rmtree
 
 from datetime import datetime, timedelta
 import aiohttp
@@ -57,7 +58,6 @@ class WeerplazaApi:
         self._hass = hass
         self._timezone = self._hass.config.time_zone
         self._session = async_get_clientsession(self._hass)
-        self.__create_storage_paths()
         self.set_setting(
             MARKER_LONGITUDE,
             (
@@ -76,6 +76,9 @@ class WeerplazaApi:
         for image_type in IMAGE_URLS:
             self._images[image_type] = []
             self._cameras[image_type] = False
+            self._storage_paths[image_type] = self._hass.config.path(
+                STORAGE_DIR, DOMAIN, image_type.value
+            )
 
     def set_setting(self, key: str, value: Any, store: bool = False) -> None:
         """Set a setting for the API."""
@@ -327,14 +330,6 @@ class WeerplazaApi:
         """Get the storage path for the given image type."""
         return self._storage_paths.get(image_type, "")
 
-    def __create_storage_paths(self):
-        for image_type in IMAGE_URLS:
-            self._storage_paths[image_type] = self._hass.config.path(
-                STORAGE_DIR, DOMAIN, image_type.value
-            )
-            if not os.path.exists(self.get_storage_path(image_type)):
-                os.makedirs(self.get_storage_path(image_type), exist_ok=True)
-
     async def async_force_refresh(self) -> None:
         """Force refresh of the images."""
         _LOGGER.debug("Refreshing Weerplaza images")
@@ -350,7 +345,13 @@ class WeerplazaApi:
     def register_camera(self, image_type: ImageType) -> None:
         """Register a camera for the given image type."""
         self._cameras[image_type] = True
+        storage_path = self.get_storage_path(image_type)
+        if not os.path.exists(storage_path):
+            os.makedirs(storage_path, exist_ok=True)
 
     def unregister_camera(self, image_type: ImageType) -> None:
         """Unregister a camera for the given image type."""
         self._cameras[image_type] = False
+        storage_path = self.get_storage_path(image_type)
+        if os.path.exists(storage_path):
+            rmtree(storage_path)
