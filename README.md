@@ -31,6 +31,7 @@ The following images (cameras) will be registered:
 - Thunder
 - Hail
 - Drizzle
+- Rain and Clouds
 
 The following sensors will be registered
 
