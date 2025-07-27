@@ -100,9 +100,7 @@ class WeerplazaApi:
             if not file_path:
                 continue
             if not self._images.get(image_type, None):
-                await self._hass.async_add_executor_job(
-                    self.__build_images_list, image_type
-                )
+                await self.__async_build_images_list(image_type)
             data = await self.__async_get_image_data(image_type)
             if not data:
                 return None
@@ -129,8 +127,7 @@ class WeerplazaApi:
                             Image.open(BytesIO(overlay_raw)) if overlay_raw else None
                         )
                         if original.width > 500:
-                            await self._hass.async_add_executor_job(
-                                self.__create_image,
+                            await self.__async_create_image(
                                 original,
                                 overlay,
                                 image_type,
@@ -138,7 +135,7 @@ class WeerplazaApi:
                             )
                             self.__add_filename_to_images(image_type, time_val)
 
-            await self.async_create_animated_gif(image_type)
+            await self.__async_create_animated_gif(image_type)
 
         self.set_setting(
             LAST_UPDATED,
@@ -194,6 +191,18 @@ class WeerplazaApi:
     def __get_marker_image(self) -> Image.Image:
         with Image.open(f"custom_components/{DOMAIN}/images/pointer-50.png") as image:
             return image.convert("RGBA")  # .resize((50, 50), Image.Resampling.LANCZOS)
+
+    async def __async_create_image(
+        self,
+        original: ImageFile.ImageFile,
+        overlay: ImageFile.ImageFile | None,
+        image_type: ImageType,
+        time_val: datetime,
+    ) -> None:
+        """Create an image with the original and overlay."""
+        await self._hass.async_add_executor_job(
+            self.__create_image, original, overlay, image_type, time_val
+        )
 
     def __create_image(
         self,
@@ -276,7 +285,7 @@ class WeerplazaApi:
                 os.remove(filename)
                 _LOGGER.debug("Removed old image: %s", filename)
 
-    async def async_create_animated_gif(self, image_type: ImageType) -> None:
+    async def __async_create_animated_gif(self, image_type: ImageType) -> None:
         """Create an animated GIF from the images."""
         await self._hass.async_add_executor_job(self.__create_animated_gif, image_type)
 
@@ -329,6 +338,10 @@ class WeerplazaApi:
                 duration=duration,
             )
 
+    async def __async_build_images_list(self, image_type: ImageType) -> None:
+        """Build the list of images from the storage path."""
+        await self._hass.async_add_executor_job(self.__build_images_list, image_type)
+
     def __build_images_list(self, image_type: ImageType) -> None:
         """Build the list of images from the storage path."""
         self._images[image_type] = []
@@ -362,7 +375,7 @@ class WeerplazaApi:
         for image_type in IMAGE_URLS:
             if not self.__is_camera_registered(image_type):
                 continue
-            await self.async_create_animated_gif(image_type)
+            await self.__async_create_animated_gif(image_type)
 
     def __is_camera_registered(self, image_type: ImageType) -> bool:
         """Check if the image type is enabled."""
