@@ -230,8 +230,8 @@ class WeerplazaApi:
 
         draw = ImageDraw.Draw(final)
         # Colors
-        textcolor = (254, 255, 255)
-        black = (0, 0, 0)
+        text_color = (254, 255, 255)
+        outline_color = (0, 0, 0)
 
         # Font
         font = ImageFont.load_default(30)
@@ -241,9 +241,10 @@ class WeerplazaApi:
 
         # Draw time
         time_str = time_val.astimezone(timezone(self._timezone)).strftime("%H:%M")
-        draw.text((textx + 1, texty), time_str, font=font, fill=black)
-        draw.text((textx + 1, texty + 1), time_str, font=font, fill=black)
-        draw.text((textx, texty), time_str, font=font, fill=textcolor)
+        for adj in range(-2, 3):
+            draw.text((textx + adj, texty), time_str, font=font, fill=outline_color)
+            draw.text((textx, texty + adj), time_str, font=font, fill=outline_color)
+        draw.text((textx, texty), time_str, font=font, fill=text_color)
 
         filename = self.__get_image_filename(image_type, time_val)
         final.save(filename, "PNG")
