@@ -18,13 +18,16 @@
                 "name": "Satellietbeelden"
             },
             "thunder": {
-                "name": "Onweer"
+                "name": "Onweerradar"
             },
             "hail": {
                 "name": "Hagel"
             },
             "drizzle_snow": {
                 "name": "Motregen/Sneeuw"
+            },
+            "radar_satellite": {
+                "name": "Regen en wolken"
             }
         },
         "number": {

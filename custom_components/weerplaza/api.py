@@ -39,6 +39,7 @@ IMAGE_URLS = {
     ImageType.THUNDER: "https://api.meteoplaza.com/v2/splash/10728/thunder?access_token=weerplaza&usehd=1",
     ImageType.HAIL: "https://api.meteoplaza.com/v2/splash/10728/hail?access_token=weerplaza&usehd=1",
     ImageType.DRIZZLE_SNOW: "https://api.meteoplaza.com/v2/splash/10728/preciptype?access_token=weerplaza&usehd=1",
+    ImageType.RADAR_SATELLITE: "https://api.meteoplaza.com/v2/splash/10728/radsat?access_token=weerplaza&usehd=1",
 }
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
@@ -112,15 +113,26 @@ class WeerplazaApi:
             for data in image_data:
                 time_val = datetime.fromisoformat(data.get("dateTime"))
                 if self.__image_needed(image_type, time_val):
-                    filename = data.get("layerNameHD")
+                    filename, overlay_filename = (
+                        data.get("layerNameHD").split(";") + [None]
+                    )[:2]
                     _LOGGER.debug("Downloading image (%s) for %s", image_type, filename)
                     image_raw = await self.__async_download_lastest_image(filename)
+                    overlay_raw = (
+                        await self.__async_download_lastest_image(overlay_filename)
+                        if overlay_filename
+                        else None
+                    )
                     if image_raw:
                         original = Image.open(BytesIO(image_raw))
+                        overlay = (
+                            Image.open(BytesIO(overlay_raw)) if overlay_raw else None
+                        )
                         if original.width > 500:
                             await self._hass.async_add_executor_job(
                                 self.__create_image,
                                 original,
+                                overlay,
                                 image_type,
                                 time_val,
                             )
@@ -184,15 +196,28 @@ class WeerplazaApi:
             return image.convert("RGBA")  # .resize((50, 50), Image.Resampling.LANCZOS)
 
     def __create_image(
-        self, original: ImageFile.ImageFile, image_type: ImageType, time_val: datetime
+        self,
+        original: ImageFile.ImageFile,
+        overlay: ImageFile.ImageFile | None,
+        image_type: ImageType,
+        time_val: datetime,
     ) -> None:
         # final image size is 1050x1148
         final = self.__get_background_image()
+
         # Resize original image to fit the final image
-        orig = original.resize(
+        original_image = original.resize(
             (final.width, final.height), Image.Resampling.LANCZOS
         ).convert("RGBA")
-        final.paste(orig, (0, 0), orig)
+        final.paste(original_image, (0, 0), original_image)
+
+        # If overlay is provided, paste it on top of the original image
+        if overlay:
+            overlay_image = overlay.resize(
+                (final.width, final.height), Image.Resampling.LANCZOS
+            ).convert("RGBA")
+            final.paste(overlay_image, (0, 0), overlay_image)
+
         # Add borders
         borders = self.__get_borders_image()
         final.paste(borders, (0, 0), borders)

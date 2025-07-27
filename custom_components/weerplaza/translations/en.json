@@ -18,13 +18,16 @@
                 "name": "Satellite"
             },
             "thunder": {
-                "name": "Thunder"
+                "name": "Lightning Radar"
             },
             "hail": {
                 "name": "Hail"
             },
             "drizzle_snow": {
                 "name": "Drizzle/Snow"
+            },
+            "radar_satellite": {
+                "name": "Rain and Clouds"
             }
         },
         "number": {

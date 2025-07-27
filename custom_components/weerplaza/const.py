@@ -19,6 +19,7 @@ SATELLITE = "satellite"
 THUNDER = "thunder"
 HAIL = "hail"
 DRIZZLE_SNOW = "drizzle_snow"
+RADAR_SATELLITE = "radar_satellite"
 
 
 class ImageType(Enum):
@@ -29,3 +30,4 @@ class ImageType(Enum):
     THUNDER = THUNDER
     HAIL = HAIL
     DRIZZLE_SNOW = DRIZZLE_SNOW
+    RADAR_SATELLITE = RADAR_SATELLITE

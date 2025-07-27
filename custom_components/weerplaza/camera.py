@@ -15,6 +15,7 @@ from .const import (
     THUNDER,
     HAIL,
     DRIZZLE_SNOW,
+    RADAR_SATELLITE,
     ImageType,
 )
 from .coordinator import WeerplazaDataUpdateCoordinator
@@ -66,6 +67,13 @@ DESCRIPTIONS: list[WeerplazaCameraEntityDescription] = [
         translation_key=DRIZZLE_SNOW,
         icon="mdi:weather-rainy",
         image_type=ImageType.DRIZZLE_SNOW,
+        entity_registry_enabled_default=False,
+    ),
+    WeerplazaCameraEntityDescription(
+        key=RADAR_SATELLITE,
+        translation_key=RADAR_SATELLITE,
+        icon="mdi:satellite",
+        image_type=ImageType.RADAR_SATELLITE,
         entity_registry_enabled_default=False,
     ),
 ]
