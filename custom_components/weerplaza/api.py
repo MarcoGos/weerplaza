@@ -262,7 +262,7 @@ class WeerplazaApi:
 
     def __get_image_filename(self, image_type: ImageType, time_val: datetime) -> str:
         """Get the filename of the latest image."""
-        return f"{self.get_storage_path(image_type)}/{time_val.strftime('%Y%m%d-%H%M')}.png"
+        return f"{self.__get_storage_path(image_type)}/{time_val.strftime('%Y%m%d-%H%M')}.png"
 
     def __image_needed(self, image_type: ImageType, time_val: datetime) -> bool:
         """Check if the image is needed based on the time."""
@@ -332,7 +332,7 @@ class WeerplazaApi:
             )  # 200 ms for all but the last frame
         if len(images) > 0:
             imageio.mimwrite(
-                f"{self.get_storage_path(image_type)}/animated.gif",
+                f"{self.__get_storage_path(image_type)}/animated.gif",
                 images,
                 loop=0,
                 duration=duration,
@@ -345,7 +345,7 @@ class WeerplazaApi:
     def __build_images_list(self, image_type: ImageType) -> None:
         """Build the list of images from the storage path."""
         self._images[image_type] = []
-        files = glob.glob(os.path.join(self.get_storage_path(image_type), "*.png"))
+        files = glob.glob(os.path.join(self.__get_storage_path(image_type), "*.png"))
         files.sort()
         for file in files:
             self._images[image_type].append(file)
@@ -354,18 +354,18 @@ class WeerplazaApi:
     async def async_get_animated_image(self, image_type: ImageType) -> bytes | None:
         """Get the animated image."""
         return await self._hass.async_add_executor_job(
-            self.get_animated_image, image_type
+            self.__get_animated_image, image_type
         )
 
-    def get_animated_image(self, image_type: ImageType) -> bytes | None:
+    def __get_animated_image(self, image_type: ImageType) -> bytes | None:
         """Get the animated image."""
-        animated_path = f"{self.get_storage_path(image_type)}/animated.gif"
+        animated_path = f"{self.__get_storage_path(image_type)}/animated.gif"
         if os.path.exists(animated_path):
             with open(animated_path, "rb") as image_file:
                 return image_file.read()
         return None
 
-    def get_storage_path(self, image_type: ImageType) -> str:
+    def __get_storage_path(self, image_type: ImageType) -> str:
         """Get the storage path for the given image type."""
         return self._storage_paths.get(image_type, "")
 
@@ -387,7 +387,7 @@ class WeerplazaApi:
 
     def __register_camera(self, image_type: ImageType) -> None:
         self._cameras[image_type] = True
-        storage_path = self.get_storage_path(image_type)
+        storage_path = self.__get_storage_path(image_type)
         if not os.path.exists(storage_path):
             os.makedirs(storage_path, exist_ok=True)
 
@@ -397,6 +397,6 @@ class WeerplazaApi:
 
     def __unregister_camera(self, image_type: ImageType) -> None:
         self._cameras[image_type] = False
-        storage_path = self.get_storage_path(image_type)
+        storage_path = self.__get_storage_path(image_type)
         if os.path.exists(storage_path):
             rmtree(storage_path)

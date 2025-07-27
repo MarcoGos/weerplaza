@@ -1,7 +1,6 @@
 """Weerplaza Switch Entities"""
 
 from typing import Any
-import logging
 from homeassistant.components.switch import (
     SwitchEntity,
     SwitchEntityDescription,
@@ -25,8 +24,6 @@ DESCRIPTIONS: list[SwitchEntityDescription] = [
         entity_category=EntityCategory.CONFIG,
     ),
 ]
-
-_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(

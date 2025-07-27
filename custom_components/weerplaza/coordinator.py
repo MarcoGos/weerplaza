@@ -25,8 +25,6 @@ class WeerplazaDataUpdateCoordinator(DataUpdateCoordinator):
     ) -> None:
         """Initialize."""
         self.api: WeerplazaApi = api
-        self.platforms: list[str] = []
-        self._hass = hass
 
         super().__init__(
             hass,

@@ -1,3 +1,5 @@
+"""Calculate Mercator position based on latitude and longitude."""
+
 import math
 
 
