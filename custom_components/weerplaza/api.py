@@ -368,15 +368,21 @@ class WeerplazaApi:
         """Check if the image type is enabled."""
         return self._cameras.get(image_type, False)
 
-    def register_camera(self, image_type: ImageType) -> None:
+    async def async_register_camera(self, image_type: ImageType) -> None:
         """Register a camera for the given image type."""
+        await self._hass.async_add_executor_job(self.__register_camera, image_type)
+
+    def __register_camera(self, image_type: ImageType) -> None:
         self._cameras[image_type] = True
         storage_path = self.get_storage_path(image_type)
         if not os.path.exists(storage_path):
             os.makedirs(storage_path, exist_ok=True)
 
-    def unregister_camera(self, image_type: ImageType) -> None:
+    async def async_unregister_camera(self, image_type: ImageType) -> None:
         """Unregister a camera for the given image type."""
+        await self._hass.async_add_executor_job(self.__unregister_camera, image_type)
+
+    def __unregister_camera(self, image_type: ImageType) -> None:
         self._cameras[image_type] = False
         storage_path = self.get_storage_path(image_type)
         if os.path.exists(storage_path):

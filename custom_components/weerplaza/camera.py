@@ -131,9 +131,13 @@ class WeerplazaCamera(WeerplazaEntity, Camera):
     async def async_added_to_hass(self) -> None:
         """Run when entity about to be added to hass."""
         await super().async_added_to_hass()
-        self.coordinator.api.register_camera(self.entity_description.image_type)
+        await self.coordinator.api.async_register_camera(
+            self.entity_description.image_type
+        )
 
     async def async_will_remove_from_hass(self) -> None:
         """Run when entity will be removed from hass."""
         await super().async_will_remove_from_hass()
-        self.coordinator.api.unregister_camera(self.entity_description.image_type)
+        await self.coordinator.api.async_unregister_camera(
+            self.entity_description.image_type
+        )
