@@ -13,7 +13,6 @@ class WeerplazaEntity(CoordinatorEntity[WeerplazaDataUpdateCoordinator]):
     """Base class for Weerplaza entities."""
 
     _attr_has_entity_name = True
-    _attr_should_poll = False
 
     def __init__(
         self,

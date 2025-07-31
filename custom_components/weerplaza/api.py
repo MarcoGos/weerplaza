@@ -145,7 +145,6 @@ class WeerplazaApi:
     async def __async_get_image_data(
         self, image_type: ImageType
     ) -> dict[str, Any] | None:
-        """Fetch the latest image data."""
         try:
             async with async_timeout.timeout(TIMEOUT):
                 async with self._session.get(
@@ -161,7 +160,6 @@ class WeerplazaApi:
             return None
 
     async def __async_download_lastest_image(self, url) -> bytes | None:
-        """Download the latest image."""
         try:
             async with async_timeout.timeout(TIMEOUT):
                 async with self._session.get(url, headers=self._headers) as response:
@@ -199,7 +197,6 @@ class WeerplazaApi:
         image_type: ImageType,
         time_val: datetime,
     ) -> None:
-        """Create an image with the original and overlay."""
         await self._hass.async_add_executor_job(
             self.__create_image, original, overlay, image_type, time_val
         )
@@ -228,8 +225,8 @@ class WeerplazaApi:
             final.paste(overlay_image, (0, 0), overlay_image)
 
         # Add borders
-        borders = self.__get_borders_image()
-        final.paste(borders, (0, 0), borders)
+        borders_image = self.__get_borders_image()
+        final.paste(borders_image, (0, 0), borders_image)
 
         # Rotate the final image -6 degrees with transparent background
         final = final.rotate(-6, expand=False, fillcolor=(0, 0, 0, 0))
@@ -248,7 +245,7 @@ class WeerplazaApi:
         textx = 10
         texty = final.height - font.size - 10  # type: ignore
 
-        # Draw time
+        # Draw time and shadow
         time_str = time_val.astimezone(timezone(self._timezone)).strftime("%H:%M")
         for adj in range(-2, 3):
             draw.text((textx + adj, texty), time_str, font=font, fill=outline_color)
@@ -261,11 +258,9 @@ class WeerplazaApi:
         os.utime(filename, (mod_time, mod_time))
 
     def __get_image_filename(self, image_type: ImageType, time_val: datetime) -> str:
-        """Get the filename of the latest image."""
         return f"{self.__get_storage_path(image_type)}/{time_val.strftime('%Y%m%d-%H%M')}.png"
 
     def __image_needed(self, image_type: ImageType, time_val: datetime) -> bool:
-        """Check if the image is needed based on the time."""
         if time_val.timestamp() > (datetime.now() - timedelta(hours=12)).timestamp():
             return not os.path.exists(self.__get_image_filename(image_type, time_val))
         return False
@@ -278,7 +273,6 @@ class WeerplazaApi:
         self.__keep_last_images(image_type)
 
     def __keep_last_images(self, image_type: ImageType):
-        """Keep only the last IMAGES_TO_KEEP images."""
         while len(self._images[image_type]) > IMAGES_TO_KEEP:
             filename = self._images[image_type].pop(0)
             if os.path.exists(filename):
@@ -286,7 +280,6 @@ class WeerplazaApi:
                 _LOGGER.debug("Removed old image: %s", filename)
 
     async def __async_create_animated_gif(self, image_type: ImageType) -> None:
-        """Create an animated GIF from the images."""
         await self._hass.async_add_executor_job(self.__create_animated_gif, image_type)
 
     def __create_animated_gif(self, image_type: ImageType):
@@ -339,11 +332,9 @@ class WeerplazaApi:
             )
 
     async def __async_build_images_list(self, image_type: ImageType) -> None:
-        """Build the list of images from the storage path."""
         await self._hass.async_add_executor_job(self.__build_images_list, image_type)
 
     def __build_images_list(self, image_type: ImageType) -> None:
-        """Build the list of images from the storage path."""
         self._images[image_type] = []
         files = glob.glob(os.path.join(self.__get_storage_path(image_type), "*.png"))
         files.sort()
@@ -358,7 +349,6 @@ class WeerplazaApi:
         )
 
     def __get_animated_image(self, image_type: ImageType) -> bytes | None:
-        """Get the animated image."""
         animated_path = f"{self.__get_storage_path(image_type)}/animated.gif"
         if os.path.exists(animated_path):
             with open(animated_path, "rb") as image_file:
@@ -366,7 +356,6 @@ class WeerplazaApi:
         return None
 
     def __get_storage_path(self, image_type: ImageType) -> str:
-        """Get the storage path for the given image type."""
         return self._storage_paths.get(image_type, "")
 
     async def async_force_refresh(self) -> None:
@@ -378,7 +367,6 @@ class WeerplazaApi:
             await self.__async_create_animated_gif(image_type)
 
     def __is_camera_registered(self, image_type: ImageType) -> bool:
-        """Check if the image type is enabled."""
         return self._cameras.get(image_type, False)
 
     async def async_register_camera(self, image_type: ImageType) -> None:

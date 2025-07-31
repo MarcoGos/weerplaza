@@ -3,6 +3,7 @@
 from datetime import timedelta
 import logging
 
+from homeassistant import config_entries
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.core import HomeAssistant
 
@@ -22,6 +23,7 @@ class WeerplazaDataUpdateCoordinator(DataUpdateCoordinator):
         self,
         hass: HomeAssistant,
         api: WeerplazaApi,
+        config_entry: config_entries.ConfigEntry,
     ) -> None:
         """Initialize."""
         self.api: WeerplazaApi = api
@@ -31,6 +33,7 @@ class WeerplazaDataUpdateCoordinator(DataUpdateCoordinator):
             _LOGGER,
             name=DOMAIN,
             update_interval=timedelta(seconds=DEFAULT_SYNC_INTERVAL),
+            config_entry=config_entry,
         )
 
     async def _async_update_data(self) -> None:
