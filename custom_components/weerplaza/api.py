@@ -297,7 +297,7 @@ class WeerplazaApi:
                 and self.setting(MARKER_LATITUDE)
             ):
                 final = Image.open(image_data).convert("RGBA")
-                marker = self.__get_marker_image()
+                marker = self.__get_marker_image().resize((40, 40))
                 marker_x, marker_y = calculate_mercator_position(
                     self.setting(MARKER_LATITUDE),
                     self.setting(MARKER_LONGITUDE),
