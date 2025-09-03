@@ -4,7 +4,7 @@ from datetime import timedelta
 import logging
 
 from homeassistant import config_entries
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.core import HomeAssistant
 
 from .api import WeerplazaApi
@@ -38,4 +38,8 @@ class WeerplazaDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self) -> None:
         """Update data via api."""
-        await self.api.async_get_new_images()
+        try:
+            await self.api.async_get_new_images()
+        except Exception as exception:
+            _LOGGER.warning("Error communicating with API: %s", exception)
+            raise UpdateFailed from exception
