@@ -122,18 +122,28 @@ class WeerplazaApi:
                         else None
                     )
                     if image_raw:
-                        original = Image.open(BytesIO(image_raw))
-                        overlay = (
-                            Image.open(BytesIO(overlay_raw)) if overlay_raw else None
-                        )
-                        if original.width > 500:
-                            await self.__async_create_image(
-                                original,
-                                overlay,
-                                image_type,
-                                time_val,
+                        try:
+                            original = Image.open(BytesIO(image_raw))
+                            overlay = (
+                                Image.open(BytesIO(overlay_raw))
+                                if overlay_raw
+                                else None
                             )
-                            self.__add_filename_to_images(image_type, time_val)
+                            if original.width > 500:
+                                await self.__async_create_image(
+                                    original,
+                                    overlay,
+                                    image_type,
+                                    time_val,
+                                )
+                                self.__add_filename_to_images(image_type, time_val)
+                        except Exception as e:
+                            _LOGGER.error(
+                                "Error processing image (%s/%s): %s",
+                                filename,
+                                overlay_filename,
+                                e,
+                            )
 
             await self.__async_create_animated_gif(image_type)
 
