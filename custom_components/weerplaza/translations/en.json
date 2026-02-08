@@ -28,6 +28,9 @@
             },
             "radar_satellite": {
                 "name": "Rain and Clouds"
+            },
+            "rain_lightning": {
+                "name": "Rain and Lightning"
             }
         },
         "number": {

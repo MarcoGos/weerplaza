@@ -66,7 +66,8 @@ class WeerplazaSwitch(WeerplazaEntity, SwitchEntity):
             entry_id=entry_id,
         )
         self.coordinator = coordinator
-        self.entity_id = f"{SWITCH_DOMAIN}.{DEFAULT_NAME}_{description.key}"
+        # self.entity_id = f"{SWITCH_DOMAIN}.{DEFAULT_NAME}_{description.key}"
+        self._attr_unique_id = f"{entry_id}_{description.key}"
 
     @property
     def is_on(self) -> bool | None:

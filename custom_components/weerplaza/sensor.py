@@ -61,7 +61,7 @@ class WeerplazaSensor(WeerplazaEntity, SensorEntity):
             description=description,
             entry_id=entry_id,
         )
-        self.entity_id = f"{SENSOR_DOMAIN}.{DEFAULT_NAME}_{description.key}"
+        self._attr_unique_id = f"{entry_id}_{description.key}"
 
     @property
     def native_value(self) -> StateType:  # type: ignore

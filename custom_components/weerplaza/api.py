@@ -40,6 +40,7 @@ IMAGE_URLS = {
     ImageType.HAIL: "https://api.meteoplaza.com/v2/splash/10728/hail?access_token=weerplaza&usehd=1",
     ImageType.DRIZZLE_SNOW: "https://api.meteoplaza.com/v2/splash/10728/preciptype?access_token=weerplaza&usehd=1",
     ImageType.RADAR_SATELLITE: "https://api.meteoplaza.com/v2/splash/10728/radsat?access_token=weerplaza&usehd=1",
+    ImageType.RAIN_LIGHTNING: "https://api.meteoplaza.com/v2/splash/10728/obs?access_token=weerplaza&usehd=1",
 }
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
@@ -116,11 +117,16 @@ class WeerplazaApi:
                     )[:2]
                     _LOGGER.debug("Downloading image (%s) for %s", image_type, filename)
                     image_raw = await self.__async_download_lastest_image(filename)
-                    overlay_raw = (
-                        await self.__async_download_lastest_image(overlay_filename)
-                        if overlay_filename
-                        else None
-                    )
+                    if image_type != ImageType.RAIN_LIGHTNING:
+                        overlay_raw = (
+                            await self.__async_download_lastest_image(overlay_filename)
+                            if overlay_filename
+                            else None
+                        )
+                    else:
+                        overlay_raw = await self.__async_download_lightning_image(
+                            time_val
+                        )
                     if image_raw:
                         try:
                             original = Image.open(BytesIO(image_raw))
@@ -184,6 +190,25 @@ class WeerplazaApi:
             _LOGGER.error("Error fetching image: %s", e)
             return None
 
+    async def __async_download_lightning_image(
+        self, time_val: datetime
+    ) -> bytes | None:
+        return await self._hass.async_add_executor_job(
+            self.__download_lightning_image, time_val
+        )
+
+    def __download_lightning_image(self, time_val: datetime) -> bytes | None:
+        filename = self._hass.config.path(
+            STORAGE_DIR,
+            "blitzortung_image",
+            f"{time_val.strftime('%Y%m%d-%H%M')}-overlay.png",
+        )
+        if os.path.exists(filename):
+            _LOGGER.warning("Blitzortung image found: %s", filename)
+            with open(filename, "rb") as image_file:
+                return image_file.read()
+        return None
+
     def __get_background_image(self) -> Image.Image:
         with Image.open(
             f"custom_components/{DOMAIN}/images/Radar-1050-v2.jpg"
@@ -228,11 +253,12 @@ class WeerplazaApi:
         final.paste(original_image, (0, 0), original_image)
 
         # If overlay is provided, paste it on top of the original image
-        if overlay:
+        if overlay and image_type != ImageType.RAIN_LIGHTNING:
             overlay_image = overlay.resize(
                 (final.width, final.height), Image.Resampling.LANCZOS
             ).convert("RGBA")
             final.paste(overlay_image, (0, 0), overlay_image)
+            _LOGGER.warning("Overlay image pasted for %s", image_type)
 
         # Add borders
         borders_image = self.__get_borders_image()
@@ -243,6 +269,13 @@ class WeerplazaApi:
 
         # Crop the final image to 776x700
         final = final.crop((157, 264, 157 + 776, 264 + 700))
+
+        if overlay and image_type == ImageType.RAIN_LIGHTNING:
+            overlay_image = overlay.resize(
+                (final.width, final.height), Image.Resampling.LANCZOS
+            ).convert("RGBA")
+            final.paste(overlay_image, (0, 0), overlay_image)
+            _LOGGER.warning("Overlay image pasted for %s", image_type)
 
         draw = ImageDraw.Draw(final)
         # Colors

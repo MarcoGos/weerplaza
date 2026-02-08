@@ -4,11 +4,11 @@ from dataclasses import dataclass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.components.camera import Camera, CameraEntityDescription
-from homeassistant.components.camera.const import DOMAIN as CAMERA_DOMAIN
+
+# from homeassistant.components.camera.const import DOMAIN as CAMERA_DOMAIN
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import (
-    DEFAULT_NAME,
     DOMAIN,
     RAIN_RADAR,
     SATELLITE,
@@ -16,6 +16,7 @@ from .const import (
     HAIL,
     DRIZZLE_SNOW,
     RADAR_SATELLITE,
+    RAIN_LIGHTNING,
     ImageType,
 )
 from .coordinator import WeerplazaDataUpdateCoordinator
@@ -34,49 +35,61 @@ class WeerplazaCameraEntityDescription(CameraEntityDescription):
     entity_registry_visible_default: bool = True
 
 
-DESCRIPTIONS: list[WeerplazaCameraEntityDescription] = [
-    WeerplazaCameraEntityDescription(
-        key=RAIN_RADAR,
-        translation_key=RAIN_RADAR,
-        icon="mdi:radar",
-        image_type=ImageType.RAIN_RADAR,
-    ),
-    WeerplazaCameraEntityDescription(
-        key=SATELLITE,
-        translation_key=SATELLITE,
-        icon="mdi:satellite",
-        image_type=ImageType.SATELLITE,
-        entity_registry_enabled_default=False,
-    ),
-    WeerplazaCameraEntityDescription(
-        key=THUNDER,
-        translation_key=THUNDER,
-        icon="mdi:lightning-bolt-outline",
-        image_type=ImageType.THUNDER,
-        entity_registry_enabled_default=False,
-    ),
-    WeerplazaCameraEntityDescription(
-        key=HAIL,
-        translation_key=HAIL,
-        icon="mdi:weather-hail",
-        image_type=ImageType.HAIL,
-        entity_registry_enabled_default=False,
-    ),
-    WeerplazaCameraEntityDescription(
-        key=DRIZZLE_SNOW,
-        translation_key=DRIZZLE_SNOW,
-        icon="mdi:weather-rainy",
-        image_type=ImageType.DRIZZLE_SNOW,
-        entity_registry_enabled_default=False,
-    ),
-    WeerplazaCameraEntityDescription(
-        key=RADAR_SATELLITE,
-        translation_key=RADAR_SATELLITE,
-        icon="mdi:satellite",
-        image_type=ImageType.RADAR_SATELLITE,
-        entity_registry_enabled_default=False,
-    ),
-]
+def __get_descriptions(hass: HomeAssistant) -> list[WeerplazaCameraEntityDescription]:
+    descriptions: list[WeerplazaCameraEntityDescription] = [
+        WeerplazaCameraEntityDescription(
+            key=RAIN_RADAR,
+            translation_key=RAIN_RADAR,
+            icon="mdi:radar",
+            image_type=ImageType.RAIN_RADAR,
+        ),
+        WeerplazaCameraEntityDescription(
+            key=SATELLITE,
+            translation_key=SATELLITE,
+            icon="mdi:satellite",
+            image_type=ImageType.SATELLITE,
+            entity_registry_enabled_default=False,
+        ),
+        WeerplazaCameraEntityDescription(
+            key=THUNDER,
+            translation_key=THUNDER,
+            icon="mdi:lightning-bolt-outline",
+            image_type=ImageType.THUNDER,
+            entity_registry_enabled_default=False,
+        ),
+        WeerplazaCameraEntityDescription(
+            key=HAIL,
+            translation_key=HAIL,
+            icon="mdi:weather-hail",
+            image_type=ImageType.HAIL,
+            entity_registry_enabled_default=False,
+        ),
+        WeerplazaCameraEntityDescription(
+            key=DRIZZLE_SNOW,
+            translation_key=DRIZZLE_SNOW,
+            icon="mdi:weather-rainy",
+            image_type=ImageType.DRIZZLE_SNOW,
+            entity_registry_enabled_default=False,
+        ),
+        WeerplazaCameraEntityDescription(
+            key=RADAR_SATELLITE,
+            translation_key=RADAR_SATELLITE,
+            icon="mdi:satellite",
+            image_type=ImageType.RADAR_SATELLITE,
+            entity_registry_enabled_default=False,
+        ),
+    ]
+    if "blitzortung_image" in hass.config.components:
+        descriptions.append(
+            WeerplazaCameraEntityDescription(
+                key=RAIN_LIGHTNING,
+                translation_key=RAIN_LIGHTNING,
+                icon="mdi:lightning-bolt",
+                image_type=ImageType.RAIN_LIGHTNING,
+                entity_registry_enabled_default=False,
+            ),
+        )
+    return descriptions
 
 
 async def async_setup_entry(
@@ -90,7 +103,7 @@ async def async_setup_entry(
     entities: list[WeerplazaCamera] = []
 
     # Add all images described above.
-    for description in DESCRIPTIONS:
+    for description in __get_descriptions(hass):
         entities.append(
             WeerplazaCamera(
                 coordinator=coordinator,
@@ -118,7 +131,7 @@ class WeerplazaCamera(WeerplazaEntity, Camera):
         )
 
         self._attr_content_type = "image/gif"
-        self.entity_id = f"{CAMERA_DOMAIN}.{DEFAULT_NAME}_{description.key}"
+        self._attr_unique_id = f"{entry_id}_{description.key}"
 
     async def async_camera_image(
         self, width: int | None = None, height: int | None = None
@@ -132,12 +145,12 @@ class WeerplazaCamera(WeerplazaEntity, Camera):
         """Run when entity about to be added to hass."""
         await super().async_added_to_hass()
         await self.coordinator.api.async_register_camera(
-            self.entity_description.image_type
+            self.entity_description.image_type  # type: ignore
         )
 
     async def async_will_remove_from_hass(self) -> None:
         """Run when entity will be removed from hass."""
         await super().async_will_remove_from_hass()
         await self.coordinator.api.async_unregister_camera(
-            self.entity_description.image_type
+            self.entity_description.image_type  # type: ignore
         )

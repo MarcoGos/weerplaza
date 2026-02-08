@@ -28,6 +28,9 @@
             },
             "radar_satellite": {
                 "name": "Regen en wolken"
+            },
+            "rain_lightning": {
+                "name": "Regen- en onweerradar"
             }
         },
         "number": {
