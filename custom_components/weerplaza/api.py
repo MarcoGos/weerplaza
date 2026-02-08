@@ -204,7 +204,7 @@ class WeerplazaApi:
             f"{time_val.strftime('%Y%m%d-%H%M')}-overlay.png",
         )
         if os.path.exists(filename):
-            _LOGGER.warning("Blitzortung image found: %s", filename)
+            _LOGGER.debug("Blitzortung image found: %s", filename)
             with open(filename, "rb") as image_file:
                 return image_file.read()
         return None
@@ -258,7 +258,6 @@ class WeerplazaApi:
                 (final.width, final.height), Image.Resampling.LANCZOS
             ).convert("RGBA")
             final.paste(overlay_image, (0, 0), overlay_image)
-            _LOGGER.warning("Overlay image pasted for %s", image_type)
 
         # Add borders
         borders_image = self.__get_borders_image()
@@ -275,7 +274,7 @@ class WeerplazaApi:
                 (final.width, final.height), Image.Resampling.LANCZOS
             ).convert("RGBA")
             final.paste(overlay_image, (0, 0), overlay_image)
-            _LOGGER.warning("Overlay image pasted for %s", image_type)
+            _LOGGER.debug("Overlay lightning image pasted for %s", image_type)
 
         draw = ImageDraw.Draw(final)
         # Colors
