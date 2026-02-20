@@ -378,7 +378,9 @@ class WeerplazaApi:
 
     def __build_images_list(self, image_type: ImageType) -> None:
         self._images[image_type] = []
-        files = glob.glob(os.path.join(self.__get_storage_path(image_type), "*.png"))
+        files = glob.glob(
+            os.path.join(self.__get_storage_path(image_type), "*[0-9].png")
+        )
         files.sort()
         for file in files:
             self._images[image_type].append(file)
