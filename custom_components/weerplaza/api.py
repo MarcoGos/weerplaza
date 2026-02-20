@@ -367,7 +367,7 @@ class WeerplazaApi:
             )  # 200 ms for all but the last frame
         if len(images) > 0:
             imageio.mimwrite(
-                f"{self.__get_storage_path(image_type)}/animated.gif",
+                f"{self.__get_storage_path(image_type)}/animated.png",
                 images,
                 loop=0,
                 duration=duration,
@@ -391,7 +391,7 @@ class WeerplazaApi:
         )
 
     def __get_animated_image(self, image_type: ImageType) -> bytes | None:
-        animated_path = f"{self.__get_storage_path(image_type)}/animated.gif"
+        animated_path = f"{self.__get_storage_path(image_type)}/animated.png"
         if os.path.exists(animated_path):
             with open(animated_path, "rb") as image_file:
                 return image_file.read()

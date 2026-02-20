@@ -4,11 +4,11 @@ from homeassistant.components.number import NumberEntity, NumberEntityDescriptio
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
-from homeassistant.components.number.const import DOMAIN as NUMBER_DOMAIN, NumberMode
+from homeassistant.components.number.const import NumberMode
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .coordinator import WeerplazaDataUpdateCoordinator
-from .const import DOMAIN, DEFAULT_NAME, MARKER_LATITUDE, MARKER_LONGITUDE
+from .const import DOMAIN, MARKER_LATITUDE, MARKER_LONGITUDE
 from .entity import WeerplazaEntity
 
 DESCRIPTIONS: list[NumberEntityDescription] = [
