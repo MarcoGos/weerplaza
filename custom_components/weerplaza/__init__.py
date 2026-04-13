@@ -6,6 +6,7 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.const import Platform
+from homeassistant.exceptions import HomeAssistantError
 
 from .api import WeerplazaApi
 from .const import DOMAIN
@@ -20,6 +21,16 @@ PLATFORMS: list[Platform] = [
 ]
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
+
+
+async def _async_run_initial_refresh(
+    coordinator: WeerplazaDataUpdateCoordinator,
+) -> None:
+    """Run first refresh in the background after setup completes."""
+    try:
+        await coordinator.async_config_entry_first_refresh()
+    except HomeAssistantError:
+        _LOGGER.exception("Initial Weerplaza refresh failed")
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -40,7 +51,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))
 
-    await coordinator.async_config_entry_first_refresh()
+    hass.async_create_task(
+        _async_run_initial_refresh(coordinator),
+        name=f"{DOMAIN}_{entry.entry_id}_initial_refresh",
+    )
 
     WeerplazaServicesSetup(hass, entry)
 
