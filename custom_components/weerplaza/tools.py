@@ -11,6 +11,7 @@ def calculate_mercator_position(
     tlat: float,
     width: int = 1050,
 ) -> tuple[int, int]:
+    """Calculate the Mercator x/y position for a latitude/longitude pair."""
     x = round((lon - llon) / (rlon - llon) * width)
 
     # Convert to radial

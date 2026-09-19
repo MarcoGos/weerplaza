@@ -1,15 +1,15 @@
 """Weerplaza Sensor Entities"""
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import EntityCategory
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
 from homeassistant.components.sensor.const import (
-    DOMAIN as SENSOR_DOMAIN,
     SensorDeviceClass,
 )
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
-from .const import DOMAIN, DEFAULT_NAME, LAST_UPDATED
+
+from .const import DOMAIN, LAST_UPDATED
 from .coordinator import WeerplazaDataUpdateCoordinator
 from .entity import WeerplazaEntity
 

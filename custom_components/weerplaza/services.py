@@ -3,8 +3,8 @@
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
 
-from .coordinator import WeerplazaDataUpdateCoordinator
 from .const import DOMAIN
+from .coordinator import WeerplazaDataUpdateCoordinator
 
 
 class WeerplazaServicesSetup:

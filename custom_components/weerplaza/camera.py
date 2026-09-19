@@ -1,22 +1,21 @@
 """Weerplaza Camera Component for Home Assistant."""
 
 from dataclasses import dataclass
+
+from homeassistant.components.camera import Camera, CameraEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.components.camera import Camera, CameraEntityDescription
-
-# from homeassistant.components.camera.const import DOMAIN as CAMERA_DOMAIN
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import (
     DOMAIN,
+    DRIZZLE_SNOW,
+    HAIL,
+    RADAR_SATELLITE,
+    RAIN_LIGHTNING,
     RAIN_RADAR,
     SATELLITE,
     THUNDER,
-    HAIL,
-    DRIZZLE_SNOW,
-    RADAR_SATELLITE,
-    RAIN_LIGHTNING,
     ImageType,
 )
 from .coordinator import WeerplazaDataUpdateCoordinator

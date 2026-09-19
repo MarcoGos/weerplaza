@@ -1,19 +1,19 @@
 """Weerplaza Switch Entities"""
 
 from typing import Any
+
 from homeassistant.components.switch import (
+    SwitchDeviceClass,
     SwitchEntity,
     SwitchEntityDescription,
-    SwitchDeviceClass,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
-from homeassistant.components.switch.const import DOMAIN as SWITCH_DOMAIN
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
+from .const import DOMAIN, SHOW_MARKER
 from .coordinator import WeerplazaDataUpdateCoordinator
-from .const import DOMAIN, DEFAULT_NAME, SHOW_MARKER
 from .entity import WeerplazaEntity
 
 DESCRIPTIONS: list[SwitchEntityDescription] = [
